@@ -1,0 +1,36 @@
+/**
+ * Imagen de producto.
+ *
+ * Sirve WebP con respaldo PNG y nunca deforma la fotografía (object-contain).
+ * Las fotos se generan con fondo transparente y el producto centrado, por lo
+ * que encajan sobre cualquier fondo del sitio.
+ *
+ * `tier`: 'sm' para tarjetas del catálogo, 'lg' para el modal y el hero.
+ */
+export default function ProductImage({
+  name,
+  alt,
+  tier = 'sm',
+  className = '',
+  loading = 'lazy',
+  fetchPriority,
+  sizes,
+  ...rest
+}) {
+  if (!name) return null
+
+  return (
+    <picture>
+      <source srcSet={`/img/${name}-${tier}.webp`} type="image/webp" sizes={sizes} />
+      <img
+        src={`/img/${name}-fallback.png`}
+        alt={alt}
+        loading={loading}
+        decoding="async"
+        fetchPriority={fetchPriority}
+        className={`object-contain ${className}`}
+        {...rest}
+      />
+    </picture>
+  )
+}

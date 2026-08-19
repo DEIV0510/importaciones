@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   MUNDO IMPORTACIONES S.A.S — Design System
+   Paleta derivada por muestreo directo del logo oficial (#07457D / #0C7DC3 /
+   #0199DA). El naranja de CTA está calibrado para cumplir contraste AA (4.56:1)
+   con texto blanco.
+   ========================================================================== */
+@theme {
+  /* --- Azul corporativo (logo) --- */
+  --color-navy-950: #04213e;
+  --color-navy-900: #062b4f;
+  --color-navy-850: #073a67;
+  --color-navy-800: #07457d; /* azul principal del logo */
+  --color-navy-700: #085a98;
+  --color-navy-600: #0c7dc3; /* azul medio del logo */
+  --color-navy-500: #0199da; /* azul brillante del logo */
+  --color-navy-400: #38b0e6;
+  --color-navy-300: #7cc9ef;
+  --color-navy-200: #b9e2f8;
+  --color-navy-100: #dceefa;
+  --color-navy-50: #f1f8fd;
+
+  /* --- Naranja de acento --- */
+  --color-flame-700: #b93d00;
+  --color-flame-600: #d04800; /* fondo de CTA: 4.56:1 con blanco (AA) */
+  --color-flame-500: #ff6b1a; /* highlights e iconos sobre azul oscuro */
+  --color-flame-400: #ff8a3d;
+  --color-flame-300: #ffa666;
+  --color-flame-100: #ffe8d9;
+  --color-flame-50: #fff5ef;
+
+  /* --- Neutros --- */
+  --color-ink: #0f2b4a; /* 14.3:1 sobre blanco */
+  --color-body: #475a70; /*  7.1:1 sobre blanco */
+  --color-muted: #54687f; /*  5.7:1 sobre blanco */
+  --color-line: #e3eaf2;
+  --color-shell: #f6f9fc;
+
+  /* --- Tipografía --- */
+  --font-display: "Manrope", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+
+  /* --- Sombras --- */
+  --shadow-card: 0 1px 2px rgb(15 43 74 / 0.04), 0 8px 24px -12px rgb(15 43 74 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(15 43 74 / 0.05), 0 22px 44px -18px rgb(15 43 74 / 0.3);
+  --shadow-cta: 0 8px 22px -10px rgb(208 72 0 / 0.65);
+  --shadow-nav: 0 1px 0 rgb(15 43 74 / 0.06), 0 10px 30px -18px rgb(15 43 74 / 0.35);
+
+  /* --- Animaciones --- */
+  --animate-float-slow: float-slow 7s ease-in-out infinite;
+  --animate-float-mid: float-mid 5.5s ease-in-out infinite;
+  --animate-pulse-ring: pulse-ring 2.6s ease-out infinite;
+  --animate-marquee: marquee 45s linear infinite;
+  --animate-orbit: orbit 2.4s linear infinite;
+  --animate-sweep: sweep 1.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@keyframes float-mid {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.92); opacity: 0.65; }
+  70%, 100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes sweep {
+  0% { transform: translateX(-105%); }
+  100% { transform: translateX(305%); }
+}
+
+/* ============================================================================
+   Base
+   ========================================================================== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6.5rem; /* aire bajo la navbar sticky al saltar a un ancla */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background-color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden; /* red de seguridad contra scroll horizontal */
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+
+  p { text-wrap: pretty; }
+
+  :focus-visible {
+    outline: 3px solid var(--color-flame-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  img, svg, video, canvas { max-width: 100%; }
+
+  ::selection {
+    background-color: var(--color-navy-800);
+    color: #fff;
+  }
+}
+
+/* ============================================================================
+   Utilidades del proyecto
+   ========================================================================== */
+@utility container-x {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+  @media (width >= 40rem) { padding-inline: 2rem; }
+  @media (width >= 80rem) { padding-inline: 2.5rem; }
+}
+
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility grid-lines-light {
+  background-image:
+    linear-gradient(to right, rgb(7 69 125 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(7 69 125 / 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+@utility reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@layer utilities {
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+  }
+
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-navy-200) transparent;
+  }
+  .scroll-slim::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background-color: var(--color-navy-200);
+    border-radius: 999px;
+  }
+  .scroll-slim::-webkit-scrollbar-track { background: transparent; }
+}
+
+/* ============================================================================
+   prefers-reduced-motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

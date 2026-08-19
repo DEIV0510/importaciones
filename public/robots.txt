@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mundoimportaciones.vercel.app/sitemap.xml
