@@ -20,7 +20,9 @@ export default function ProductImage({
   if (!name) return null
 
   return (
-    <picture>
+    // `contents` saca al <picture> del layout: la <img> queda como hijo directo
+    // del contenedor, así hereda su centrado y sus porcentajes sin desalinearse.
+    <picture className="contents">
       <source srcSet={`/img/${name}-${tier}.webp`} type="image/webp" sizes={sizes} />
       <img
         src={`/img/${name}-fallback.png`}

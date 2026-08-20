@@ -19,7 +19,7 @@ export default function Footer() {
         <div className="grid gap-12 py-16 sm:py-20 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10">
           {/* Marca */}
           <div>
-            <picture>
+            <picture className="contents">
               <source srcSet="/img/logo-220.webp" type="image/webp" />
               <img
                 src="/img/logo-220.png"

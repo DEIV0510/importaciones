@@ -118,7 +118,7 @@ export default function Navbar() {
               aria-label="Mundo Importaciones S.A.S. — Inicio"
               className="flex shrink-0 items-center rounded-lg"
             >
-              <picture>
+              <picture className="contents">
                 <source srcSet="/img/logo-220.webp" type="image/webp" />
                 <img
                   src="/img/logo-220.png"

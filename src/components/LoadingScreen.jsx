@@ -105,14 +105,16 @@ export default function LoadingScreen() {
             <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2" />
           </svg>
 
-          <picture>
+          {/* Centrado absoluto: no depende de cómo el navegador trate a
+              <picture>/<source> como elementos de la rejilla */}
+          <picture className="contents">
             <source srcSet="/img/logo-220.webp" type="image/webp" />
             <img
               src="/img/logo-220.png"
               alt="Mundo Importaciones S.A.S."
               width="220"
               height="232"
-              className="w-[62%] drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
+              className="absolute top-1/2 left-1/2 w-[58%] -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
               fetchPriority="high"
             />
           </picture>
