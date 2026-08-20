@@ -2,7 +2,6 @@ import LoadingScreen from './components/LoadingScreen'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Marquee from './components/Marquee'
-import About from './components/About'
 import Products from './components/Products'
 import Solutions from './components/Solutions'
 import Location from './components/Location'
@@ -20,7 +19,6 @@ export default function App() {
       <main id="contenido">
         <Hero />
         <Marquee />
-        <About />
         <Products />
         <Solutions />
         <Location />

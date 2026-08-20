@@ -11,6 +11,8 @@ export default function ProductImage({
   name,
   alt,
   tier = 'sm',
+  /** Respaldo PNG. Por defecto el del catálogo; el hero usa su propio recorte. */
+  fallback = 'fallback',
   className = '',
   loading = 'lazy',
   fetchPriority,
@@ -25,7 +27,7 @@ export default function ProductImage({
     <picture className="contents">
       <source srcSet={`/img/${name}-${tier}.webp`} type="image/webp" sizes={sizes} />
       <img
-        src={`/img/${name}-fallback.png`}
+        src={`/img/${name}-${fallback}.png`}
         alt={alt}
         loading={loading}
         decoding="async"

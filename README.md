@@ -6,6 +6,10 @@ en el Centro de Medellín.
 
 **Objetivo de conversión:** que el visitante contacte a la empresa por WhatsApp.
 
+El recorrido es deliberadamente corto: del hero se pasa directo al catálogo.
+No hay sección «Nosotros» — se retiró junto con sus bloques de propuesta de
+valor para no interponer texto entre la portada y los productos.
+
 ---
 
 ## Puesta en marcha
@@ -50,7 +54,7 @@ src/
     useUi.js           scroll, bloqueo de body, Escape, foco atrapado, sección activa
   components/
     ui/                Button · ProductImage · Reveal · SectionHeading · BrandIcons
-    LoadingScreen · Navbar · Hero · Marquee · About · Products
+    LoadingScreen · Navbar · Hero · Marquee · Products
     CategoryCard · ProductCard · ProductModal · Solutions
     Location · Contact · FinalCTA · Footer · FloatingWhatsApp
 ```
@@ -66,9 +70,14 @@ Todo el catálogo vive en `src/data/products.js`; no hay productos escritos dent
 
 ```
 <slug>-sm.webp        ~400 px  (tarjetas del catálogo)
-<slug>-lg.webp        ~800 px  (modal y hero)
+<slug>-lg.webp        ~800 px  (modal)
 <slug>-fallback.png   ~560 px  (navegadores sin WebP)
 ```
+
+Estas tres van sobre **lienzo cuadrado**, para que la grilla del catálogo se vea
+pareja. Los cinco productos de la vitrina del hero tienen además un recorte
+ajustado al contorno (`<slug>-hero.webp` y `<slug>-hero.png`), porque allí cada
+panel tiene su propia proporción y el lienzo cuadrado dejaba las fotos pequeñas.
 
 **2. Añade el producto** a la lista `PRODUCTS`:
 

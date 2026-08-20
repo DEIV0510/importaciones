@@ -93,11 +93,16 @@ export const WA_MESSAGES = {
   category: (name) => `Hola, quiero información sobre la línea de ${name}.`,
 }
 
-/** Enlaces de la navegación principal. */
+/**
+ * Enlaces de la navegación principal.
+ * Se retiró "Nosotros" al eliminar esa sección: del hero se pasa directo
+ * a los productos. Añadir aquí un enlace exige que exista la sección con
+ * ese id, o el menú quedaría roto.
+ */
 export const NAV_LINKS = [
   { href: '#inicio', label: 'Inicio' },
-  { href: '#nosotros', label: 'Nosotros' },
   { href: '#productos', label: 'Productos' },
+  { href: '#catalogo', label: 'Catálogo' },
   { href: '#soluciones', label: 'Soluciones' },
   { href: '#contacto', label: 'Contacto' },
 ]
