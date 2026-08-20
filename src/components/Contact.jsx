@@ -1,7 +1,7 @@
 import { ArrowUpRight, MessageSquareText, Phone } from 'lucide-react'
 import SectionHeading from './ui/SectionHeading'
 import Reveal from './ui/Reveal'
-import { WhatsAppIcon, SOCIAL_ICONS } from './ui/BrandIcons'
+import { WhatsAppIcon, SocialIcon } from './ui/BrandIcons'
 import { PHONES, SOCIALS, WA_MESSAGES, waLink } from '../data/company'
 
 export default function Contact() {
@@ -84,33 +84,30 @@ export default function Contact() {
           </Reveal>
 
           <ul className="mt-5 grid gap-3 sm:grid-cols-3">
-            {SOCIALS.map((s, i) => {
-              const Icon = SOCIAL_ICONS[s.id]
-              return (
-                <Reveal as="li" key={s.id} delay={i * 90} className="h-full">
-                  <a
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex h-full items-center gap-3.5 rounded-2xl border border-line bg-white p-4 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-navy-800/25 hover:shadow-card"
-                  >
-                    <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-800 transition-colors duration-300 group-hover:bg-navy-800 group-hover:text-white">
-                      <Icon className="size-5" />
+            {SOCIALS.map((s, i) => (
+              <Reveal as="li" key={s.id} delay={i * 90} className="h-full">
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex h-full items-center gap-3.5 rounded-2xl border border-line bg-white p-4 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-navy-800/25 hover:shadow-card"
+                >
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-800 transition-colors duration-300 group-hover:bg-navy-800 group-hover:text-white">
+                    <SocialIcon id={s.id} className="size-5" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-display text-sm font-extrabold text-ink">
+                      {s.label}
                     </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-display text-sm font-extrabold text-ink">
-                        {s.label}
-                      </span>
-                      <span className="block truncate text-xs text-body">{s.handle}</span>
-                    </span>
-                    <ArrowUpRight
-                      className="size-4 shrink-0 text-muted transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      aria-hidden="true"
-                    />
-                  </a>
-                </Reveal>
-              )
-            })}
+                    <span className="block truncate text-xs text-body">{s.handle}</span>
+                  </span>
+                  <ArrowUpRight
+                    className="size-4 shrink-0 text-muted transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    aria-hidden="true"
+                  />
+                </a>
+              </Reveal>
+            ))}
           </ul>
         </div>
       </div>

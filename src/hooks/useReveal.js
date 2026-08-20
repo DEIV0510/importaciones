@@ -14,16 +14,15 @@ export function prefersReducedMotion() {
  */
 export function useReveal({ threshold = 0.15, rootMargin = '0px 0px -8% 0px' } = {}) {
   const ref = useRef(null)
-  const [visible, setVisible] = useState(() => prefersReducedMotion())
+  // Si no hay animación posible (motion reducido o sin IntersectionObserver),
+  // el contenido nace visible en lugar de aparecer tras un efecto.
+  const [visible, setVisible] = useState(
+    () => prefersReducedMotion() || typeof IntersectionObserver === 'undefined'
+  )
 
   useEffect(() => {
     const node = ref.current
     if (!node || visible) return
-
-    if (typeof IntersectionObserver === 'undefined') {
-      setVisible(true)
-      return
-    }
 
     const observer = new IntersectionObserver(
       (entries) => {

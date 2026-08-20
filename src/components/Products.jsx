@@ -167,7 +167,8 @@ export default function Products() {
         </div>
       </section>
 
-      <ProductModal product={openProduct} onClose={closeModal} />
+      {/* `key` por producto: al abrir otro, la galería arranca en la primera imagen */}
+      <ProductModal key={openProduct?.id ?? 'cerrado'} product={openProduct} onClose={closeModal} />
     </>
   )
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapPin, Menu, Phone, X } from 'lucide-react'
 import Button from './ui/Button'
-import { WhatsAppIcon, SOCIAL_ICONS } from './ui/BrandIcons'
+import { WhatsAppIcon, SocialIcon } from './ui/BrandIcons'
 import {
   ADDRESS,
   NAV_LINKS,
@@ -88,22 +88,19 @@ export default function Navbar() {
               <span className="h-4 w-px bg-white/20" aria-hidden="true" />
 
               <ul className="flex items-center gap-3">
-                {SOCIALS.map((s) => {
-                  const Icon = SOCIAL_ICONS[s.id]
-                  return (
-                    <li key={s.id}>
-                      <a
-                        href={s.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${s.label}: ${s.handle}`}
-                        className="block rounded text-navy-200 transition-colors hover:text-white"
-                      >
-                        <Icon className="size-4" />
-                      </a>
-                    </li>
-                  )
-                })}
+                {SOCIALS.map((s) => (
+                  <li key={s.id}>
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${s.label}: ${s.handle}`}
+                      className="block rounded text-navy-200 transition-colors hover:text-white"
+                    >
+                      <SocialIcon id={s.id} className="size-4" />
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -276,22 +273,19 @@ export default function Navbar() {
               </p>
 
               <ul className="mt-4 flex items-center gap-2">
-                {SOCIALS.map((s) => {
-                  const Icon = SOCIAL_ICONS[s.id]
-                  return (
-                    <li key={s.id}>
-                      <a
-                        href={s.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${s.label}: ${s.handle}`}
-                        className="grid size-11 place-items-center rounded-xl border border-line text-navy-800 transition-colors hover:border-navy-800/30 hover:bg-navy-50"
-                      >
-                        <Icon className="size-[1.15rem]" />
-                      </a>
-                    </li>
-                  )
-                })}
+                {SOCIALS.map((s) => (
+                  <li key={s.id}>
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${s.label}: ${s.handle}`}
+                      className="grid size-11 place-items-center rounded-xl border border-line text-navy-800 transition-colors hover:border-navy-800/30 hover:bg-navy-50"
+                    >
+                      <SocialIcon id={s.id} className="size-[1.15rem]" />
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

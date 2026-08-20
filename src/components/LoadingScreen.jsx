@@ -17,7 +17,6 @@ export default function LoadingScreen() {
     const started = Date.now()
     const reduced = prefersReducedMotion()
     let hideTimer
-    let removeTimer
 
     const finish = () => {
       const elapsed = Date.now() - started
@@ -34,7 +33,6 @@ export default function LoadingScreen() {
       window.removeEventListener('load', finish)
       clearTimeout(hideTimer)
       clearTimeout(safety)
-      clearTimeout(removeTimer)
     }
   }, [])
 

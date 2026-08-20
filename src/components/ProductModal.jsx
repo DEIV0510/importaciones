@@ -17,13 +17,14 @@ export default function ProductModal({ product, onClose }) {
   useEscape(open, onClose)
   useFocusTrap(panelRef, open)
 
-  // Reinicia la galería y lleva el foco al abrir otro producto
+  // Lleva el foco al botón de cerrar al abrir.
+  // La galería no necesita reiniciarse aquí: Products.jsx monta este componente
+  // con `key` por producto, así que `index` vuelve a 0 solo.
   useEffect(() => {
     if (!open) return
-    setIndex(0)
     const t = setTimeout(() => closeRef.current?.focus(), 40)
     return () => clearTimeout(t)
-  }, [open, product?.id])
+  }, [open])
 
   if (!open) return null
 

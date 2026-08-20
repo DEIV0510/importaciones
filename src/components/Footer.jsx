@@ -1,5 +1,5 @@
 import { ArrowUp, MapPin, Phone } from 'lucide-react'
-import { SOCIAL_ICONS } from './ui/BrandIcons'
+import { SocialIcon } from './ui/BrandIcons'
 import { CATEGORIES } from '../data/categories'
 import { ADDRESS, COMPANY, MAPS, NAV_LINKS, PHONES, SOCIALS } from '../data/company'
 
@@ -36,22 +36,19 @@ export default function Footer() {
             </p>
 
             <ul className="mt-6 flex items-center gap-2.5">
-              {SOCIALS.map((s) => {
-                const Icon = SOCIAL_ICONS[s.id]
-                return (
-                  <li key={s.id}>
-                    <a
-                      href={s.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${s.label}: ${s.handle}`}
-                      className="grid size-11 place-items-center rounded-xl border border-white/12 bg-white/5 text-navy-100 transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/12 hover:text-white"
-                    >
-                      <Icon className="size-[1.15rem]" />
-                    </a>
-                  </li>
-                )
-              })}
+              {SOCIALS.map((s) => (
+                <li key={s.id}>
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${s.label}: ${s.handle}`}
+                    className="grid size-11 place-items-center rounded-xl border border-white/12 bg-white/5 text-navy-100 transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/12 hover:text-white"
+                  >
+                    <SocialIcon id={s.id} className="size-[1.15rem]" />
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 

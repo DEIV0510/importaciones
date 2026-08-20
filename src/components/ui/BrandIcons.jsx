@@ -66,8 +66,10 @@ export function FacebookIcon({ className = '', ...rest }) {
   )
 }
 
-export const SOCIAL_ICONS = {
-  instagram: InstagramIcon,
-  tiktok: TikTokIcon,
-  facebook: FacebookIcon,
+/** Elige el icono de red social por su id (ver SOCIALS en data/company.js). */
+export function SocialIcon({ id, ...rest }) {
+  if (id === 'instagram') return <InstagramIcon {...rest} />
+  if (id === 'tiktok') return <TikTokIcon {...rest} />
+  if (id === 'facebook') return <FacebookIcon {...rest} />
+  return null
 }
