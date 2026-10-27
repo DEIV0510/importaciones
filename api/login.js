@@ -53,8 +53,8 @@ export default manejar(async (req, res) => {
   const secreto = process.env.AUTH_SECRET
   if (!hash || !secreto || secreto.length < 32) {
     throw new ErrorHttp(
-      500,
-      'El panel no está configurado. Faltan ADMIN_PASSWORD_HASH o AUTH_SECRET.'
+      503,
+      'El panel no está configurado. Faltan ADMIN_PASSWORD_HASH o AUTH_SECRET en el servidor.'
     )
   }
 

@@ -121,7 +121,7 @@ export class ErrorHttp extends Error {
 export function exigirAdmin(req) {
   const secreto = process.env.AUTH_SECRET
   if (!secreto || secreto.length < 32) {
-    throw new ErrorHttp(500, 'El servidor no tiene AUTH_SECRET configurado.')
+    throw new ErrorHttp(503, 'El panel no está configurado: falta AUTH_SECRET en el servidor.')
   }
   if (req.headers['x-panel'] !== '1') {
     throw new ErrorHttp(403, 'Petición no autorizada.')

@@ -49,7 +49,7 @@ muestra un aviso de «todavía no está configurado» en lugar de fallar.
 
 ### 1.4 Entra
 
-`https://tu-dominio/admin`
+`https://importaciones-olive.vercel.app/admin`
 
 ---
 

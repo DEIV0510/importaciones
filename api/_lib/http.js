@@ -53,13 +53,16 @@ export function manejar(fn) {
       await fn(req, res)
     } catch (err) {
       const estado = err?.estado ?? 500
-      if (estado >= 500) {
+      // El 503 (panel sin configurar) es un estado conocido y su mensaje ayuda a
+      // resolverlo. Los demás 5xx sí se ocultan: pueden delatar algo interno.
+      const oculto = estado >= 500 && estado !== 503
+      if (oculto) {
         // Solo al registro del servidor; nunca al navegador.
         console.error('[api]', req.url, err)
       }
       if (!res.headersSent) {
         json(res, estado, {
-          error: estado >= 500 ? 'Error interno del servidor.' : err.message,
+          error: oculto ? 'Error interno del servidor.' : err.message,
           campo: err?.campo ?? null,
         })
       }

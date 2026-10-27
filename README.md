@@ -141,7 +141,7 @@ certificaciones, marcas aliadas, testimonios, premios, horarios ni precios.
 - **Horario de atención.** No se publicó porque no fue suministrado. Si lo confirmas,
   puede añadirse a la sección de ubicación y a los datos estructurados
   (`openingHoursSpecification` en `index.html`).
-- **Dominio definitivo.** `index.html`, `robots.txt` y `sitemap.xml` usan
+- **Dominio definitivo.** El sitio vive en `https://importaciones-olive.vercel.app`.
   `https://mundoimportaciones.vercel.app`. Cámbialo al dominio real antes de publicar.
 
 ---
