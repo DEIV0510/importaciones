@@ -1,0 +1,304 @@
+[
+  {
+    "id": "aceitera",
+    "alt": "Aceitera",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 42052,
+    "origen": "inicial"
+  },
+  {
+    "id": "bobinas",
+    "alt": "Bobinas",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 164670,
+    "origen": "inicial"
+  },
+  {
+    "id": "carnaza-blanca",
+    "alt": "Carnaza blanca",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 228015,
+    "origen": "inicial"
+  },
+  {
+    "id": "carnaza-natural",
+    "alt": "Carnaza natural",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 308235,
+    "origen": "inicial"
+  },
+  {
+    "id": "cinta-faya-clasica",
+    "alt": "Cinta faya clasica",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 197313,
+    "origen": "inicial"
+  },
+  {
+    "id": "cinta-faya-rosada",
+    "alt": "Cinta faya rosada",
+    "variantes": [
+      "fallback",
+      "hero",
+      "lg",
+      "sm"
+    ],
+    "bytes": 426511,
+    "origen": "inicial"
+  },
+  {
+    "id": "cinta-raso-azul",
+    "alt": "Cinta raso azul",
+    "variantes": [
+      "fallback",
+      "hero",
+      "lg",
+      "sm"
+    ],
+    "bytes": 370695,
+    "origen": "inicial"
+  },
+  {
+    "id": "cinta-raso-roja",
+    "alt": "Cinta raso roja",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 233758,
+    "origen": "inicial"
+  },
+  {
+    "id": "cortadora-compacta",
+    "alt": "Cortadora compacta",
+    "variantes": [
+      "fallback",
+      "hero",
+      "lg",
+      "sm"
+    ],
+    "bytes": 224425,
+    "origen": "inicial"
+  },
+  {
+    "id": "cortadora-industrial",
+    "alt": "Cortadora industrial",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 154089,
+    "origen": "inicial"
+  },
+  {
+    "id": "elastico-espigado",
+    "alt": "Elastico espigado",
+    "variantes": [
+      "fallback",
+      "hero",
+      "lg",
+      "sm"
+    ],
+    "bytes": 432883,
+    "origen": "inicial"
+  },
+  {
+    "id": "elastico-griego",
+    "alt": "Elastico griego",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 288204,
+    "origen": "inicial"
+  },
+  {
+    "id": "elastico-monograma",
+    "alt": "Elastico monograma",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 300928,
+    "origen": "inicial"
+  },
+  {
+    "id": "elastico-plano-blanco",
+    "alt": "Elastico plano blanco",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 170808,
+    "origen": "inicial"
+  },
+  {
+    "id": "elastico-plano-negro",
+    "alt": "Elastico plano negro",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 187591,
+    "origen": "inicial"
+  },
+  {
+    "id": "lampara-led-arco",
+    "alt": "Lampara led arco",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 116725,
+    "origen": "inicial"
+  },
+  {
+    "id": "lampara-led-barra-larga",
+    "alt": "Lampara led barra larga",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 149917,
+    "origen": "inicial"
+  },
+  {
+    "id": "lampara-led-brazo",
+    "alt": "Lampara led brazo",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 153079,
+    "origen": "inicial"
+  },
+  {
+    "id": "lampara-led-compacta",
+    "alt": "Lampara led compacta",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 115034,
+    "origen": "inicial"
+  },
+  {
+    "id": "lampara-led-flexible",
+    "alt": "Lampara led flexible",
+    "variantes": [
+      "fallback",
+      "hero",
+      "lg",
+      "sm"
+    ],
+    "bytes": 151113,
+    "origen": "inicial"
+  },
+  {
+    "id": "lampara-led-modulo",
+    "alt": "Lampara led modulo",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 98375,
+    "origen": "inicial"
+  },
+  {
+    "id": "logo",
+    "alt": "Logotipo de Mundo Importaciones S.A.S.",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 385154,
+    "origen": "inicial"
+  },
+  {
+    "id": "millare-dorado",
+    "alt": "Millare dorado",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 407397,
+    "origen": "inicial"
+  },
+  {
+    "id": "millare-navideno",
+    "alt": "Millare navideno",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 405589,
+    "origen": "inicial"
+  },
+  {
+    "id": "millare-plata",
+    "alt": "Millare plata",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 439805,
+    "origen": "inicial"
+  },
+  {
+    "id": "prensatelas",
+    "alt": "Prensatelas",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 47714,
+    "origen": "inicial"
+  },
+  {
+    "id": "repuesto-metalico",
+    "alt": "Repuesto metalico",
+    "variantes": [
+      "fallback",
+      "lg",
+      "sm"
+    ],
+    "bytes": 60829,
+    "origen": "inicial"
+  }
+]

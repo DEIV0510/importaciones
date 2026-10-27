@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { WhatsAppIcon } from './ui/BrandIcons'
-import { PRIMARY_PHONE, WA_MESSAGES, waLink } from '../data/company'
+import { useContent } from '../content/ContentContext'
 
 /**
  * Botón flotante de WhatsApp.
@@ -8,6 +8,8 @@ import { PRIMARY_PHONE, WA_MESSAGES, waLink } from '../data/company'
  * en móvil. Su posición usa safe-area para no chocar con la barra del sistema.
  */
 export default function FloatingWhatsApp() {
+  const { PRIMARY_PHONE, WA_MESSAGES, waLink, flotante } = useContent()
+
   const [show, setShow] = useState(false)
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export default function FloatingWhatsApp() {
           aria-hidden="true"
           className="pointer-events-none absolute right-full mr-3 hidden origin-right scale-95 rounded-xl bg-navy-900 px-3.5 py-2 text-sm font-semibold whitespace-nowrap text-white opacity-0 shadow-lift transition-[opacity,transform] duration-200 group-hover:scale-100 group-hover:opacity-100 lg:block"
         >
-          Escríbenos por WhatsApp
+          {flotante.tooltip}
           <span className="absolute top-1/2 -right-1 size-2 -translate-y-1/2 rotate-45 bg-navy-900" />
         </span>
       </a>

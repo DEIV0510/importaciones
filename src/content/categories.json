@@ -1,0 +1,74 @@
+[
+  {
+    "id": "confeccion",
+    "nombre": "Insumos para confección",
+    "corto": "Confección",
+    "descripcion": "Insumos de uso diario para talleres y fábricas de confección.",
+    "imagen": "cinta-faya-clasica",
+    "visible": true,
+    "orden": 0
+  },
+  {
+    "id": "cintas",
+    "nombre": "Cintas y pasamanería",
+    "corto": "Cintas",
+    "descripcion": "Cinta raso, cinta faya y millaré en distintos colores y acabados.",
+    "imagen": "cinta-raso-azul",
+    "visible": true,
+    "orden": 1
+  },
+  {
+    "id": "elasticos",
+    "nombre": "Elásticos",
+    "corto": "Elásticos",
+    "descripcion": "Elásticos planos y estampados para prendas y acabados.",
+    "imagen": "elastico-espigado",
+    "visible": true,
+    "orden": 2
+  },
+  {
+    "id": "marroquineria",
+    "nombre": "Marroquinería",
+    "corto": "Marroquinería",
+    "descripcion": "Carnaza y materiales para trabajos de marroquinería y calzado.",
+    "imagen": "carnaza-natural",
+    "visible": true,
+    "orden": 3
+  },
+  {
+    "id": "repuestos",
+    "nombre": "Repuestos para máquinas",
+    "corto": "Repuestos",
+    "descripcion": "Prensatelas, bobinas, aceiteras y repuestos de mantenimiento.",
+    "imagen": "bobinas",
+    "visible": true,
+    "orden": 4
+  },
+  {
+    "id": "cortadoras",
+    "nombre": "Máquinas cortadoras",
+    "corto": "Cortadoras",
+    "descripcion": "Máquinas cortadoras de confección para corte de tela.",
+    "imagen": "cortadora-compacta",
+    "visible": true,
+    "orden": 5
+  },
+  {
+    "id": "lamparas",
+    "nombre": "Lámparas para máquinas",
+    "corto": "Lámparas",
+    "descripcion": "Iluminación LED para puestos de trabajo y máquinas de coser.",
+    "imagen": "lampara-led-brazo",
+    "visible": true,
+    "orden": 6
+  },
+  {
+    "id": "otros",
+    "nombre": "Otros insumos",
+    "corto": "Otros",
+    "descripcion": "Seda italiana, metros de modistería y demás insumos del portafolio.",
+    "imagen": "millare-navideno",
+    "visible": true,
+    "orden": 7
+  }
+]

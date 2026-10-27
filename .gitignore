@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Variables del panel (local). NUNCA se sube al repositorio.
+.env
+.env.*
+!.env.example

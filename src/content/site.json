@@ -1,0 +1,314 @@
+{
+  "version": 1,
+  "actualizado": null,
+  "actualizadoPor": null,
+
+  "identidad": {
+    "nombreLegal": "MUNDO IMPORTACIONES S.A.S.",
+    "nombreCorto": "Mundo Importaciones",
+    "lema": "Todo lo que tu taller, fábrica o emprendimiento necesita.",
+    "descripcion": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas.",
+    "descripcionLarga": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas. Todo lo que tu taller, fábrica o emprendimiento necesita, ofreciendo variedad, disponibilidad y atención cercana para negocios, talleres y emprendedores.",
+    "logo": "logo",
+    "cargaTexto": "Importación · Distribución"
+  },
+
+  "contacto": {
+    "telefonos": [
+      { "id": "tel-1", "display": "350 276 8542", "wa": "573502768542" },
+      { "id": "tel-2", "display": "305 391 9202", "wa": "573053919202" }
+    ],
+    "redes": [
+      {
+        "id": "instagram",
+        "label": "Instagram",
+        "handle": "Mundo_importaciones__",
+        "url": "https://www.instagram.com/mundo_importaciones__/",
+        "visible": true
+      },
+      {
+        "id": "tiktok",
+        "label": "TikTok",
+        "handle": "@Mundo_importacioness",
+        "url": "https://www.tiktok.com/@mundo_importacioness",
+        "visible": true
+      },
+      {
+        "id": "facebook",
+        "label": "Facebook",
+        "handle": "MUNDO IMPORTACIONES SAS",
+        "url": "https://www.facebook.com/search/top?q=MUNDO%20IMPORTACIONES%20SAS",
+        "visible": true
+      }
+    ],
+    "mensajes": {
+      "cotizacion": "Hola, quiero solicitar una cotización de insumos. Me gustaría conocer disponibilidad y condiciones.",
+      "general": "Hola, vengo de la página web de Mundo Importaciones y quisiera más información.",
+      "ubicacion": "Hola, quisiera confirmar la ubicación y cómo llegar al punto de venta.",
+      "producto": "Hola, quiero consultar disponibilidad de: {producto}.",
+      "categoria": "Hola, quiero información sobre la línea de {categoria}."
+    },
+    "flotante": {
+      "visible": true,
+      "tooltip": "Escríbenos por WhatsApp"
+    }
+  },
+
+  "ubicacion": {
+    "visible": true,
+    "eyebrow": "Ubicación",
+    "titulo": "Visítanos en el Centro de Medellín",
+    "subtitulo": "Estamos en pleno centro, con atención directa para negocios, talleres y emprendedores.",
+    "calle": "CLL 47 43-85 PISO 2",
+    "sector": "Centro de Medellín",
+    "referencia": "Por las Torres de Bomboná",
+    "ciudad": "Medellín",
+    "region": "Antioquia",
+    "pais": "Colombia",
+    "codigoPais": "CO",
+    "consultaMapa": "Calle 47 # 43-85, Centro, Medellín, Antioquia, Colombia",
+    "etiquetas": {
+      "calle": "Dirección",
+      "sector": "Sector",
+      "referencia": "Punto de referencia"
+    },
+    "ctaComoLlegar": "Cómo llegar",
+    "ctaWhatsapp": "Escribir por WhatsApp"
+  },
+
+  "navegacion": {
+    "enlaces": [
+      { "id": "nav-inicio", "href": "#inicio", "label": "Inicio", "visible": true },
+      { "id": "nav-productos", "href": "#productos", "label": "Productos", "visible": true },
+      { "id": "nav-catalogo", "href": "#catalogo", "label": "Catálogo", "visible": true },
+      { "id": "nav-soluciones", "href": "#soluciones", "label": "Soluciones", "visible": true },
+      { "id": "nav-contacto", "href": "#contacto", "label": "Contacto", "visible": true }
+    ],
+    "ctaTexto": "Solicitar cotización",
+    "barraSuperior": true
+  },
+
+  "hero": {
+    "chip": "Importación",
+    "chipTexto": "Distribución para talleres, fábricas y emprendimientos",
+    "tituloAntes": "Todo lo que tu taller, ",
+    "tituloDestacado": "fábrica",
+    "tituloDespues": " o emprendimiento necesita.",
+    "subtitulo": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas.",
+    "ctaPrimario": "Solicitar cotización",
+    "ctaSecundario": "Ver productos",
+    "ctaSecundarioHref": "#productos",
+    "mostrarDireccion": true,
+    "pilares": [
+      { "id": "pil-1", "icono": "Scissors", "texto": "Confección" },
+      { "id": "pil-2", "icono": "PackageCheck", "texto": "Marroquinería y calzado" },
+      { "id": "pil-3", "icono": "Wrench", "texto": "Repuestos de máquina" }
+    ],
+    "vitrina": [
+      {
+        "id": "vit-1",
+        "imagen": "cinta-faya-rosada",
+        "label": "Cinta faya",
+        "alt": "Rollos de cinta faya en tonos rosados",
+        "forma": "destacada"
+      },
+      {
+        "id": "vit-2",
+        "imagen": "cinta-raso-azul",
+        "label": "Cinta raso",
+        "alt": "Rollos de cinta raso en tonos azules",
+        "forma": "vertical"
+      },
+      {
+        "id": "vit-3",
+        "imagen": "cortadora-compacta",
+        "label": "Cortadoras",
+        "alt": "Máquina cortadora de confección",
+        "forma": "vertical"
+      },
+      {
+        "id": "vit-4",
+        "imagen": "lampara-led-flexible",
+        "label": "Lámparas",
+        "alt": "Lámpara LED de brazo flexible para máquina de coser",
+        "forma": "ancha"
+      },
+      {
+        "id": "vit-5",
+        "imagen": "elastico-espigado",
+        "label": "Elásticos",
+        "alt": "Elásticos espigados en tonos tierra",
+        "forma": "ancha"
+      }
+    ]
+  },
+
+  "marquesina": {
+    "visible": true,
+    "items": [
+      "Cinta raso",
+      "Cinta faya",
+      "Elásticos",
+      "Carnaza",
+      "Millaré",
+      "Repuestos de máquina",
+      "Máquinas cortadoras",
+      "Lámparas",
+      "Seda italiana",
+      "Metros de modistería"
+    ]
+  },
+
+  "categoriasSeccion": {
+    "visible": true,
+    "eyebrow": "Nuestras líneas",
+    "titulo": "Todo para tu producción",
+    "subtitulo": "Insumos, repuestos y equipos para confección, calzado y marroquinería. Elige una línea y mira lo que tenemos disponible.",
+    "ctaTarjeta": "Ver productos"
+  },
+
+  "catalogoSeccion": {
+    "visible": true,
+    "eyebrow": "Catálogo",
+    "titulo": "Nuestros productos",
+    "subtitulo": "Fotografías reales de nuestro portafolio. Toca cualquier producto para ver el detalle y consultar disponibilidad.",
+    "ctaCabecera": "Solicitar cotización",
+    "etiquetaFiltro": "Filtrar por línea",
+    "etiquetaTodos": "Todos",
+    "textoConsultar": "Consultar",
+    "vacio": "Aún no hay productos publicados en esta línea. Escríbenos y te contamos qué tenemos disponible.",
+    "sinFoto": "Foto próximamente",
+    "sinDescripcion": "Consulta disponibilidad con nuestro equipo.",
+    "modalNota": "No publicamos precios en línea. Escríbenos por WhatsApp y te confirmamos disponibilidad y condiciones.",
+    "modalCta": "Consultar por WhatsApp",
+    "cierre": {
+      "visible": true,
+      "titulo": "¿No encuentras lo que buscas?",
+      "texto": "Nuestro portafolio es más amplio que lo publicado aquí. Cuéntanos qué insumo necesitas y te orientamos.",
+      "cta": "Escríbenos por WhatsApp"
+    }
+  },
+
+  "soluciones": {
+    "visible": true,
+    "eyebrow": "Para quién trabajamos",
+    "titulo": "Soluciones para quienes hacen que las cosas sucedan.",
+    "subtitulo": "Somos el aliado de abastecimiento de negocios que producen todos los días.",
+    "cta": "Cuéntanos qué necesitas",
+    "items": [
+      {
+        "id": "sol-1",
+        "icono": "Wrench",
+        "titulo": "Talleres",
+        "texto": "Repuestos, lámparas y consumibles para mantener las máquinas trabajando."
+      },
+      {
+        "id": "sol-2",
+        "icono": "Factory",
+        "titulo": "Fábricas",
+        "texto": "Abastecimiento de insumos para procesos de producción continuos."
+      },
+      {
+        "id": "sol-3",
+        "icono": "Rocket",
+        "titulo": "Emprendedores",
+        "texto": "Atención cercana para quienes están armando su negocio."
+      },
+      {
+        "id": "sol-4",
+        "icono": "Shirt",
+        "titulo": "Negocios de confección",
+        "texto": "Cintas, elásticos y accesorios para prendas y terminaciones."
+      },
+      {
+        "id": "sol-5",
+        "icono": "Footprints",
+        "titulo": "Negocios de calzado",
+        "texto": "Materiales e insumos para los distintos procesos del calzado."
+      },
+      {
+        "id": "sol-6",
+        "icono": "Briefcase",
+        "titulo": "Marroquinería",
+        "texto": "Carnaza y materiales para bolsos, cinturones y accesorios."
+      }
+    ]
+  },
+
+  "contactoSeccion": {
+    "visible": true,
+    "eyebrow": "Contacto",
+    "titulo": "¿Qué necesitas para tu negocio?",
+    "subtitulo": "Cuéntanos qué producto estás buscando y nuestro equipo podrá orientarte.",
+    "etiquetaLlamar": "¿Prefieres llamar?",
+    "etiquetaRedes": "Síguenos"
+  },
+
+  "ctaFinal": {
+    "visible": true,
+    "chip": "Mundo Importaciones S.A.S.",
+    "titulo": "Encuentra los insumos que tu negocio necesita.",
+    "texto": "Conoce nuestro portafolio y comunícate con Mundo Importaciones.",
+    "ctaPrimario": "Solicitar cotización",
+    "ctaSecundario": "Ver productos",
+    "imagenes": ["cinta-faya-clasica", "carnaza-natural", "bobinas"]
+  },
+
+  "pie": {
+    "descripcion": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas. Todo lo que tu taller, fábrica o emprendimiento necesita.",
+    "tituloNavegacion": "Navegación",
+    "tituloLineas": "Líneas",
+    "tituloContacto": "Contacto",
+    "copyright": "© {anio} MUNDO IMPORTACIONES S.A.S. Todos los derechos reservados.",
+    "anio": 2026,
+    "volverArriba": "Volver arriba",
+    "avisoLegal": ""
+  },
+
+  "seo": {
+    "titulo": "Mundo Importaciones S.A.S. | Insumos de confección, calzado y marroquinería en Medellín",
+    "descripcion": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas en el Centro de Medellín. Cintas, elásticos, carnaza, millaré, lámparas y máquinas cortadoras.",
+    "url": "https://importaciones-chi.vercel.app",
+    "ogImagen": "/og-image.jpg",
+    "indexar": true
+  },
+
+  "tema": {
+    "colores": {
+      "navy-950": "#04213e",
+      "navy-900": "#062b4f",
+      "navy-850": "#073a67",
+      "navy-800": "#07457d",
+      "navy-700": "#085a98",
+      "navy-600": "#0c7dc3",
+      "navy-500": "#0199da",
+      "navy-400": "#38b0e6",
+      "navy-100": "#dceefa",
+      "navy-50": "#f1f8fd",
+      "flame-700": "#b93d00",
+      "flame-600": "#d04800",
+      "flame-500": "#ff6b1a",
+      "flame-400": "#ff8a3d",
+      "ink": "#0f2b4a",
+      "body": "#475a70",
+      "muted": "#54687f",
+      "line": "#e3eaf2",
+      "shell": "#f6f9fc"
+    },
+    "tipografia": {
+      "display": "Manrope",
+      "texto": "Inter"
+    },
+    "radio": "1rem"
+  },
+
+  "secciones": [
+    { "id": "hero", "visible": true },
+    { "id": "marquesina", "visible": true },
+    { "id": "productos", "visible": true },
+    { "id": "soluciones", "visible": true },
+    { "id": "ubicacion", "visible": true },
+    { "id": "contacto", "visible": true },
+    { "id": "ctaFinal", "visible": true }
+  ]
+}

@@ -1,0 +1,246 @@
+[
+  {
+    "id": "cinta-faya",
+    "nombre": "Cinta faya",
+    "categorias": [
+      "cintas",
+      "confeccion"
+    ],
+    "imagen": "cinta-faya-clasica",
+    "galeria": [
+      "cinta-faya-clasica",
+      "cinta-faya-rosada"
+    ],
+    "descripcion": "Cinta faya de textura acanalada, disponible en varios colores. Consulta los tonos y anchos disponibles.",
+    "destacado": true,
+    "visible": true,
+    "orden": 0
+  },
+  {
+    "id": "cinta-raso",
+    "nombre": "Cinta raso",
+    "categorias": [
+      "cintas",
+      "confeccion"
+    ],
+    "imagen": "cinta-raso-azul",
+    "galeria": [
+      "cinta-raso-azul",
+      "cinta-raso-roja"
+    ],
+    "descripcion": "Cinta raso de acabado satinado, disponible en varios colores. Consulta los tonos y anchos disponibles.",
+    "destacado": true,
+    "visible": true,
+    "orden": 1
+  },
+  {
+    "id": "millare",
+    "nombre": "Millaré",
+    "categorias": [
+      "cintas",
+      "otros"
+    ],
+    "imagen": "millare-dorado",
+    "galeria": [
+      "millare-dorado",
+      "millare-plata"
+    ],
+    "descripcion": "Pasamanería tipo millaré para apliques y terminaciones decorativas.",
+    "destacado": true,
+    "visible": true,
+    "orden": 2
+  },
+  {
+    "id": "millare-navideno",
+    "nombre": "Millaré navideño",
+    "categorias": [
+      "cintas",
+      "otros"
+    ],
+    "imagen": "millare-navideno",
+    "galeria": null,
+    "descripcion": "Millaré en combinación de colores navideños para trabajos de temporada.",
+    "destacado": true,
+    "visible": true,
+    "orden": 3
+  },
+  {
+    "id": "elasticos-estampados",
+    "nombre": "Elásticos estampados",
+    "categorias": [
+      "elasticos",
+      "confeccion"
+    ],
+    "imagen": "elastico-monograma",
+    "galeria": [
+      "elastico-monograma",
+      "elastico-griego",
+      "elastico-espigado"
+    ],
+    "descripcion": "Elásticos con diseño estampado en distintos anchos y combinaciones de color.",
+    "destacado": true,
+    "visible": true,
+    "orden": 4
+  },
+  {
+    "id": "elastico-plano",
+    "nombre": "Elástico plano",
+    "categorias": [
+      "elasticos",
+      "confeccion"
+    ],
+    "imagen": "elastico-plano-blanco",
+    "galeria": [
+      "elastico-plano-blanco",
+      "elastico-plano-negro"
+    ],
+    "descripcion": "Elástico plano en presentación de rollo, en blanco y negro.",
+    "destacado": true,
+    "visible": true,
+    "orden": 5
+  },
+  {
+    "id": "carnaza",
+    "nombre": "Carnaza",
+    "categorias": [
+      "marroquineria"
+    ],
+    "imagen": "carnaza-natural",
+    "galeria": [
+      "carnaza-natural",
+      "carnaza-blanca"
+    ],
+    "descripcion": "Tira de carnaza en rollo para trabajos de marroquinería, calzado y accesorios.",
+    "destacado": true,
+    "visible": true,
+    "orden": 6
+  },
+  {
+    "id": "prensatelas",
+    "nombre": "Prensatelas",
+    "categorias": [
+      "repuestos"
+    ],
+    "imagen": "prensatelas",
+    "galeria": null,
+    "descripcion": "Prensatelas de repuesto para máquina de confección.",
+    "destacado": false,
+    "visible": true,
+    "orden": 7
+  },
+  {
+    "id": "bobinas",
+    "nombre": "Bobinas",
+    "categorias": [
+      "repuestos"
+    ],
+    "imagen": "bobinas",
+    "galeria": null,
+    "descripcion": "Bobinas metálicas para máquina de confección, en caja.",
+    "destacado": true,
+    "visible": true,
+    "orden": 8
+  },
+  {
+    "id": "aceitera",
+    "nombre": "Aceitera",
+    "categorias": [
+      "repuestos"
+    ],
+    "imagen": "aceitera",
+    "galeria": null,
+    "descripcion": "Aceitera para lubricación y mantenimiento de máquinas.",
+    "destacado": false,
+    "visible": true,
+    "orden": 9
+  },
+  {
+    "id": "repuestos-maquina",
+    "nombre": "Repuestos para máquina",
+    "categorias": [
+      "repuestos"
+    ],
+    "imagen": "repuesto-metalico",
+    "galeria": null,
+    "descripcion": "Piezas y repuestos para máquinas de confección. Consúltanos la referencia que necesitas.",
+    "destacado": false,
+    "visible": true,
+    "orden": 10
+  },
+  {
+    "id": "maquina-cortadora",
+    "nombre": "Máquina cortadora de confección",
+    "categorias": [
+      "cortadoras"
+    ],
+    "imagen": "cortadora-compacta",
+    "galeria": [
+      "cortadora-compacta",
+      "cortadora-industrial"
+    ],
+    "descripcion": "Máquina cortadora de disco para corte de tela. Consulta los modelos disponibles.",
+    "destacado": true,
+    "visible": true,
+    "orden": 11
+  },
+  {
+    "id": "lampara-led-maquina",
+    "nombre": "Lámpara LED para máquina",
+    "categorias": [
+      "lamparas"
+    ],
+    "imagen": "lampara-led-brazo",
+    "galeria": [
+      "lampara-led-brazo",
+      "lampara-led-barra-larga",
+      "lampara-led-arco",
+      "lampara-led-flexible",
+      "lampara-led-compacta"
+    ],
+    "descripcion": "Lámpara LED de brazo flexible para iluminar el área de trabajo de la máquina. Consulta los modelos disponibles.",
+    "destacado": true,
+    "visible": true,
+    "orden": 12
+  },
+  {
+    "id": "lampara-led-modulo",
+    "nombre": "Lámpara LED tipo barra",
+    "categorias": [
+      "lamparas"
+    ],
+    "imagen": "lampara-led-modulo",
+    "galeria": null,
+    "descripcion": "Módulo de iluminación LED tipo barra para puesto de trabajo.",
+    "destacado": false,
+    "visible": true,
+    "orden": 13
+  },
+  {
+    "id": "metros-modisteria",
+    "nombre": "Metros de modistería",
+    "categorias": [
+      "otros",
+      "confeccion"
+    ],
+    "imagen": null,
+    "galeria": null,
+    "descripcion": null,
+    "destacado": false,
+    "visible": true,
+    "orden": 14
+  },
+  {
+    "id": "seda-italiana",
+    "nombre": "Seda italiana",
+    "categorias": [
+      "otros",
+      "confeccion"
+    ],
+    "imagen": null,
+    "galeria": null,
+    "descripcion": null,
+    "destacado": false,
+    "visible": true,
+    "orden": 15
+  }
+]

@@ -3,11 +3,12 @@ import { ChevronLeft, ChevronRight, Layers, MapPin, Phone, X } from 'lucide-reac
 import ProductImage from './ui/ProductImage'
 import Button from './ui/Button'
 import { WhatsAppIcon } from './ui/BrandIcons'
-import { CATEGORY_BY_ID } from '../data/categories'
-import { ADDRESS, PHONES, WA_MESSAGES, waLink } from '../data/company'
 import { useBodyLock, useEscape, useFocusTrap } from '../hooks/useUi'
+import { useContent } from '../content/ContentContext'
 
 export default function ProductModal({ product, onClose }) {
+  const { CATEGORY_BY_ID, ADDRESS, PHONES, WA_MESSAGES, waLink, catalogoSeccion } = useContent()
+
   const open = Boolean(product)
   const panelRef = useRef(null)
   const closeRef = useRef(null)
@@ -93,7 +94,7 @@ export default function ProductModal({ product, onClose }) {
                     <span className="grid size-16 place-items-center rounded-2xl border border-navy-800/12 bg-white text-navy-600 shadow-card">
                       <Layers className="size-7" aria-hidden="true" />
                     </span>
-                    <span className="text-sm font-semibold text-muted">Foto próximamente</span>
+                    <span className="text-sm font-semibold text-muted">{catalogoSeccion.sinFoto}</span>
                   </div>
                 </div>
               )}
@@ -144,7 +145,7 @@ export default function ProductModal({ product, onClose }) {
           <div className="scroll-slim flex flex-col p-6 sm:overflow-y-auto sm:p-8">
             {categories.length > 0 && (
               <nav aria-label="Categoría" className="flex flex-wrap items-center gap-1.5 text-xs">
-                <span className="font-semibold text-muted">Catálogo</span>
+                <span className="font-semibold text-muted">{catalogoSeccion.eyebrow}</span>
                 <span aria-hidden="true" className="text-line">
                   /
                 </span>
@@ -163,7 +164,7 @@ export default function ProductModal({ product, onClose }) {
 
             <p className="mt-4 text-[0.9375rem] leading-relaxed text-body">
               {product.description ??
-                'Este producto hace parte de nuestro portafolio. Escríbenos y te confirmamos disponibilidad, presentaciones y colores.'}
+                catalogoSeccion.sinDescripcion}
             </p>
 
             {categories.length > 1 && (
@@ -194,7 +195,7 @@ export default function ProductModal({ product, onClose }) {
                 icon={WhatsAppIcon}
                 className="w-full"
               >
-                Consultar por WhatsApp
+                {catalogoSeccion.modalCta}
               </Button>
 
               <div className="grid grid-cols-2 gap-2.5">

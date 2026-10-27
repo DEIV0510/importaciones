@@ -1,23 +1,20 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { MapPin, Menu, Phone, X } from 'lucide-react'
 import Button from './ui/Button'
+import Logo from './ui/Logo'
 import { WhatsAppIcon, SocialIcon } from './ui/BrandIcons'
-import {
-  ADDRESS,
-  NAV_LINKS,
-  PHONES,
-  SOCIALS,
-  WA_MESSAGES,
-  waLink,
-} from '../data/company'
+import { useContent } from '../content/ContentContext'
 import { useActiveSection, useBodyLock, useEscape, useFocusTrap, useScrolled } from '../hooks/useUi'
 
-const SECTION_IDS = NAV_LINKS.map((l) => l.href.slice(1))
-
 export default function Navbar() {
+  const { ADDRESS, NAV_LINKS, PHONES, SOCIALS, WA_MESSAGES, waLink, nav, COMPANY } = useContent()
+
   const [open, setOpen] = useState(false)
   const scrolled = useScrolled(40)
-  const active = useActiveSection(SECTION_IDS)
+  // Las secciones observadas salen del propio menú, así que si el panel
+  // añade o quita un enlace el resaltado sigue funcionando.
+  const sectionIds = useMemo(() => NAV_LINKS.map((l) => l.href.slice(1)), [NAV_LINKS])
+  const active = useActiveSection(sectionIds)
   const panelRef = useRef(null)
   const toggleRef = useRef(null)
 
@@ -57,7 +54,9 @@ export default function Navbar() {
             : 'bg-transparent'
         }`}
       >
-        {/* Barra de utilidades — solo escritorio, se oculta al bajar */}
+        {/* Barra de utilidades — solo escritorio, se oculta al bajar.
+            El panel puede desactivarla entera desde Navegación. */}
+        {nav.barraSuperior !== false && (
         <div
           className={`hidden overflow-hidden border-b border-white/10 bg-navy-900 text-navy-100 transition-[max-height,opacity] duration-300 lg:block ${
             scrolled ? 'max-h-0 opacity-0' : 'max-h-12 opacity-100'
@@ -105,6 +104,7 @@ export default function Navbar() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Barra principal */}
         <nav aria-label="Navegación principal" className="container-x">
@@ -115,21 +115,14 @@ export default function Navbar() {
           >
             <a
               href="#inicio"
-              aria-label="Mundo Importaciones S.A.S. — Inicio"
+              aria-label={`${COMPANY.legalName} — Inicio`}
               className="flex shrink-0 items-center rounded-lg"
             >
-              <picture className="contents">
-                <source srcSet="/img/logo-220.webp" type="image/webp" />
-                <img
-                  src="/img/logo-220.png"
-                  alt="Mundo Importaciones S.A.S."
-                  width="220"
-                  height="232"
-                  className={`w-auto transition-[height,filter] duration-300 ${
-                    scrolled ? 'h-14 sm:h-15' : 'h-15 sm:h-18 lg:h-20'
-                  } ${solid ? '' : 'drop-shadow-[0_4px_14px_rgba(0,0,0,0.35)]'}`}
-                />
-              </picture>
+              <Logo
+                className={`w-auto transition-[height,filter] duration-300 ${
+                  scrolled ? 'h-14 sm:h-15' : 'h-15 sm:h-18 lg:h-20'
+                } ${solid ? '' : 'drop-shadow-[0_4px_14px_rgba(0,0,0,0.35)]'}`}
+              />
             </a>
 
             {/* Enlaces — escritorio */}
@@ -167,14 +160,14 @@ export default function Navbar() {
                 arrow
                 className="whitespace-nowrap max-sm:hidden"
               >
-                Solicitar cotización
+                {nav.ctaTexto}
               </Button>
 
               <a
                 href={waLink(WA_MESSAGES.quote)}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Solicitar cotización por WhatsApp"
+                aria-label={`${nav.ctaTexto} por WhatsApp`}
                 className="grid size-11 place-items-center rounded-xl bg-flame-600 text-white transition-colors hover:bg-flame-700 sm:hidden"
               >
                 <WhatsAppIcon className="size-5" />
@@ -242,7 +235,7 @@ export default function Navbar() {
 
             <div className="mt-5">
               <Button href={waLink(WA_MESSAGES.quote)} variant="primary" size="lg" arrow className="w-full">
-                Solicitar cotización
+                {nav.ctaTexto}
               </Button>
             </div>
 

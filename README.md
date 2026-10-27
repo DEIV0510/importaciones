@@ -12,6 +12,14 @@ valor para no interponer texto entre la portada y los productos.
 
 ---
 
+## Panel de administración
+
+El contenido del sitio se edita desde **`/admin`** sin tocar el código: textos,
+productos, imágenes, menú, orden de las secciones, colores y SEO. Al publicar,
+el panel hace un commit en este mismo repositorio y Vercel reconstruye el sitio.
+
+Puesta en marcha, seguridad y uso: **[PANEL.md](PANEL.md)**.
+
 ## Puesta en marcha
 
 ```bash
@@ -19,7 +27,12 @@ npm install
 npm run dev      # http://localhost:5254
 npm run build    # genera dist/
 npm run preview  # sirve dist/ para revisarlo
+npm run qa       # ejecuta las pruebas
 ```
+
+Con `npm run dev` el panel también funciona, en `/admin`. Sin token de GitHub
+escribe en el disco local en lugar de publicar: así se puede probar entero sin
+tocar producción.
 
 ## Tecnología
 
@@ -29,6 +42,9 @@ npm run preview  # sirve dist/ para revisarlo
 | Estilos | Tailwind CSS 4 (`@theme`, sin archivo de configuración JS) |
 | Iconos | `lucide-react` + SVG propios para logotipos de marca |
 | Animación | CSS puro + `IntersectionObserver` (sin librerías de animación) |
+| Contenido | JSON en `src/content/`, editable desde `/admin` |
+| Servidor | Funciones de Vercel en `api/` (mismo repositorio) |
+| Pruebas | playwright-core sobre el Chrome ya instalado |
 
 No se usa Framer Motion: las animaciones necesarias (entrada al hacer scroll, flotación,
 hover, marquesina) se resuelven con CSS, lo que evita kilobytes de JavaScript y respeta
@@ -44,11 +60,19 @@ public/
   og-image.jpg         imagen para redes sociales
   favicon.png · apple-touch-icon.png · site.webmanifest
   robots.txt · sitemap.xml
+api/                   funciones del servidor (Vercel), mismo repositorio
+  _lib/                autenticación, almacén en GitHub, validación, HTTP
+  login · logout · session · content · media · history
+qa/                    pruebas automatizadas
 src/
-  data/
-    company.js         NAP, teléfonos, redes, enlaces de WhatsApp y Google Maps
-    categories.js      las 8 líneas del catálogo
-    products.js        catálogo de productos
+  content/
+    site.json          textos, menú, contacto, ubicación, SEO y colores
+    categories.json    las líneas del catálogo
+    products.json      catálogo de productos
+    media.json         biblioteca de imágenes
+    validacion.js      qué es contenido válido (lo usan panel y servidor)
+    derive.js          convierte el JSON en el modelo que pintan los componentes
+  admin/               el panel (se carga aparte: no pesa en el sitio público)
   hooks/
     useReveal.js       animación de entrada + detección de motion reducido
     useUi.js           scroll, bloqueo de body, Escape, foco atrapado, sección activa
@@ -63,7 +87,10 @@ src/
 
 ## Cómo ampliar el catálogo
 
-Todo el catálogo vive en `src/data/products.js`; no hay productos escritos dentro del HTML.
+**Lo normal es hacerlo desde `/admin` → Catálogo**, sin tocar archivos.
+Lo que sigue solo hace falta para cargas masivas desde el código.
+
+Todo el catálogo vive en `src/content/products.json`; no hay productos escritos dentro del HTML.
 
 **1. Prepara las fotos.** Con fondo transparente y el producto centrado. Guarda en
 `public/img/` con este patrón:
@@ -100,7 +127,7 @@ Un producto con `image: null` se muestra con un marcador gráfico y el botón
 
 ## Datos de la empresa
 
-Se editan en un solo lugar: `src/data/company.js`.
+Se editan desde `/admin`, o directamente en `src/content/site.json`.
 
 Todo el contenido del sitio proviene del material entregado por la empresa.
 **No se inventaron** años de experiencia, número de clientes, países de origen,

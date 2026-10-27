@@ -2,9 +2,11 @@ import { ArrowUpRight, MessageSquareText, Phone } from 'lucide-react'
 import SectionHeading from './ui/SectionHeading'
 import Reveal from './ui/Reveal'
 import { WhatsAppIcon, SocialIcon } from './ui/BrandIcons'
-import { PHONES, SOCIALS, WA_MESSAGES, waLink } from '../data/company'
+import { useContent } from '../content/ContentContext'
 
 export default function Contact() {
+  const { PHONES, SOCIALS, WA_MESSAGES, waLink, contactoSeccion } = useContent()
+
   return (
     <section
       id="contacto"
@@ -14,10 +16,10 @@ export default function Contact() {
       <div className="container-x">
         <SectionHeading
           id="contacto-titulo"
-          eyebrow="Contacto"
+          eyebrow={contactoSeccion.eyebrow}
           align="center"
-          title="¿Qué necesitas para tu negocio?"
-          subtitle="Cuéntanos qué producto estás buscando y nuestro equipo podrá orientarte."
+          title={contactoSeccion.titulo}
+          subtitle={contactoSeccion.subtitulo}
         />
 
         {/* Líneas de WhatsApp */}
@@ -57,7 +59,7 @@ export default function Contact() {
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-line bg-white p-5 sm:flex-row sm:gap-5">
             <span className="flex items-center gap-2 text-sm font-semibold text-body">
               <Phone className="size-4 text-flame-600" aria-hidden="true" />
-              ¿Prefieres llamar?
+              {contactoSeccion.etiquetaLlamar}
             </span>
             <span className="flex flex-wrap justify-center gap-2">
               {PHONES.map((p) => (
@@ -78,7 +80,7 @@ export default function Contact() {
           <Reveal className="flex items-center gap-3">
             <MessageSquareText className="size-4 text-flame-600" aria-hidden="true" />
             <h3 className="font-display text-sm font-bold tracking-[0.14em] text-muted uppercase">
-              Síguenos
+              {contactoSeccion.etiquetaRedes}
             </h3>
             <span aria-hidden="true" className="h-px flex-1 bg-line" />
           </Reveal>

@@ -1,22 +1,24 @@
 import { Images, Layers, Plus } from 'lucide-react'
 import ProductImage from './ui/ProductImage'
-import { CATEGORY_BY_ID } from '../data/categories'
+import { useContent } from '../content/ContentContext'
 
 /** Marcador para productos que aún no tienen fotografía propia. */
-function ImagePlaceholder() {
+function ImagePlaceholder({ texto }) {
   return (
     <div className="absolute inset-0 grid place-items-center">
       <div className="flex flex-col items-center gap-3 px-6 text-center">
         <span className="grid size-12 place-items-center rounded-2xl border border-navy-800/12 bg-white text-navy-600 shadow-card sm:size-14">
           <Layers className="size-5 sm:size-6" aria-hidden="true" />
         </span>
-        <span className="text-xs font-medium text-muted">Foto próximamente</span>
+        <span className="text-xs font-medium text-muted">{texto}</span>
       </div>
     </div>
   )
 }
 
 export default function ProductCard({ product, onOpen }) {
+  const { CATEGORY_BY_ID, catalogoSeccion } = useContent()
+
   const primaryCategory = CATEGORY_BY_ID[product.categories[0]]
   const galleryCount = product.gallery?.length ?? 0
 
@@ -35,7 +37,7 @@ export default function ProductCard({ product, onOpen }) {
             className="absolute inset-0 size-full p-5 transition-transform duration-500 ease-out group-hover:scale-[1.07] sm:p-7"
           />
         ) : (
-          <ImagePlaceholder />
+          <ImagePlaceholder texto={catalogoSeccion.sinFoto} />
         )}
 
         {galleryCount > 1 && (
@@ -64,7 +66,7 @@ export default function ProductCard({ product, onOpen }) {
           </p>
         ) : (
           <p className="mt-2 flex-1 text-sm leading-relaxed text-muted italic">
-            Consulta disponibilidad con nuestro equipo.
+            {catalogoSeccion.sinDescripcion}
           </p>
         )}
 
@@ -74,7 +76,7 @@ export default function ProductCard({ product, onOpen }) {
           className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border-2 border-navy-800/15 bg-white text-sm font-bold text-navy-800 transition-[background-color,border-color,color] duration-200 group-hover:border-flame-600 group-hover:bg-flame-600 group-hover:text-white"
         >
           <Plus className="size-4" aria-hidden="true" />
-          Consultar
+          {catalogoSeccion.textoConsultar}
           <span className="sr-only"> disponibilidad de {product.name}</span>
         </button>
       </div>

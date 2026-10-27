@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { prefersReducedMotion } from '../hooks/useReveal'
+import { useContent } from '../content/ContentContext'
+import Logo from './ui/Logo'
 
 const MIN_VISIBLE = 700 // ms — evita un parpadeo brusco en conexiones rápidas
 const MAX_VISIBLE = 2200 // ms — nunca retiene la página más de esto
@@ -10,6 +12,8 @@ const MAX_VISIBLE = 2200 // ms — nunca retiene la página más de esto
  * Desaparece sola en cuanto la página está lista y se desmonta tras el fundido.
  */
 export default function LoadingScreen() {
+  const { COMPANY } = useContent()
+
   const [done, setDone] = useState(false) // empieza el fundido de salida
   const [gone, setGone] = useState(false) // se retira del DOM
 
@@ -58,7 +62,7 @@ export default function LoadingScreen() {
     <div
       role="status"
       aria-live="polite"
-      aria-label="Cargando Mundo Importaciones"
+      aria-label={`Cargando ${COMPANY.shortName}`}
       className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-navy-900 transition-opacity duration-[600ms] ease-out ${
         done ? 'pointer-events-none opacity-0' : 'opacity-100'
       }`}
@@ -107,21 +111,14 @@ export default function LoadingScreen() {
 
           {/* Centrado absoluto: no depende de cómo el navegador trate a
               <picture>/<source> como elementos de la rejilla */}
-          <picture className="contents">
-            <source srcSet="/img/logo-220.webp" type="image/webp" />
-            <img
-              src="/img/logo-220.png"
-              alt="Mundo Importaciones S.A.S."
-              width="220"
-              height="232"
-              className="absolute top-1/2 left-1/2 w-[58%] -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
-              fetchPriority="high"
-            />
-          </picture>
+          <Logo
+            className="absolute top-1/2 left-1/2 w-[58%] -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
+            fetchPriority="high"
+          />
         </div>
 
         <p className="mt-8 text-center font-display text-xs font-bold tracking-[0.34em] text-navy-200 uppercase sm:text-sm">
-          Importación · Distribución
+          {COMPANY.loadingText}
         </p>
 
         {/* Indicador de progreso */}

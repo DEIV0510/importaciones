@@ -5,7 +5,7 @@ import ProductImage from './ui/ProductImage'
  * Tarjeta de categoría. Al activarse filtra el catálogo y baja hasta él.
  * Es un <button> real: funciona con teclado y lectores de pantalla.
  */
-export default function CategoryCard({ category, count, onSelect }) {
+export default function CategoryCard({ category, count, cta, onSelect }) {
   return (
     <button
       type="button"
@@ -47,7 +47,7 @@ export default function CategoryCard({ category, count, onSelect }) {
         </p>
 
         <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-flame-600 sm:mt-4 sm:text-sm">
-          Ver productos
+          {cta}
           <ArrowRight
             className="size-3.5 transition-transform duration-200 group-hover:translate-x-1 sm:size-4"
             aria-hidden="true"

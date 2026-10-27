@@ -1,9 +1,11 @@
 import Button from './ui/Button'
 import Reveal from './ui/Reveal'
 import ProductImage from './ui/ProductImage'
-import { WA_MESSAGES, waLink } from '../data/company'
+import { useContent } from '../content/ContentContext'
 
 export default function FinalCTA() {
+  const { WA_MESSAGES, waLink, ctaFinal } = useContent()
+
   return (
     <section aria-labelledby="cta-final-titulo" className="bg-shell pb-20 sm:pb-24 lg:pb-28">
       <div className="container-x">
@@ -27,26 +29,26 @@ export default function FinalCTA() {
           <div className="relative grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
             <div className="max-w-2xl">
               <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3.5 py-1.5 text-xs font-bold tracking-[0.14em] text-flame-300 uppercase">
-                Mundo Importaciones S.A.S.
+                {ctaFinal.chip}
               </p>
 
               <h2
                 id="cta-final-titulo"
                 className="mt-5 text-[1.875rem] leading-[1.1] font-extrabold text-white sm:text-4xl lg:text-[2.75rem]"
               >
-                Encuentra los insumos que tu negocio necesita.
+                {ctaFinal.titulo}
               </h2>
 
               <p className="mt-4 max-w-xl text-base leading-relaxed text-navy-100 sm:text-lg">
-                Conoce nuestro portafolio y comunícate con Mundo Importaciones.
+                {ctaFinal.texto}
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Button href={waLink(WA_MESSAGES.quote)} variant="primary" size="lg" arrow>
-                  Solicitar cotización
+                  {ctaFinal.ctaPrimario}
                 </Button>
                 <Button href="#productos" variant="ghostLight" size="lg">
-                  Ver productos
+                  {ctaFinal.ctaSecundario}
                 </Button>
               </div>
             </div>
@@ -65,7 +67,7 @@ export default function FinalCTA() {
 
                 <figure className="absolute top-[2%] left-[4%] w-[52%] animate-float-slow">
                   <ProductImage
-                    name="cinta-faya-clasica"
+                    name={ctaFinal.imagenes?.[0]}
                     alt=""
                     aria-hidden="true"
                     tier="sm"
@@ -77,7 +79,7 @@ export default function FinalCTA() {
                   style={{ animationDelay: '800ms' }}
                 >
                   <ProductImage
-                    name="carnaza-natural"
+                    name={ctaFinal.imagenes?.[1]}
                     alt=""
                     aria-hidden="true"
                     tier="sm"
@@ -89,7 +91,7 @@ export default function FinalCTA() {
                   style={{ animationDelay: '1500ms' }}
                 >
                   <ProductImage
-                    name="bobinas"
+                    name={ctaFinal.imagenes?.[2]}
                     alt=""
                     aria-hidden="true"
                     tier="sm"

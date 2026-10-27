@@ -3,15 +3,18 @@ import SectionHeading from './ui/SectionHeading'
 import Reveal from './ui/Reveal'
 import Button from './ui/Button'
 import { WhatsAppIcon } from './ui/BrandIcons'
-import { ADDRESS, MAPS, WA_MESSAGES, waLink } from '../data/company'
-
-const DETAILS = [
-  { icon: MapPin, label: 'Dirección', value: ADDRESS.street },
-  { icon: Building2, label: 'Sector', value: ADDRESS.area },
-  { icon: Navigation, label: 'Punto de referencia', value: ADDRESS.reference },
-]
+import { useContent } from '../content/ContentContext'
 
 export default function Location() {
+  const { ADDRESS, MAPS, WA_MESSAGES, waLink, ubicacion, COMPANY } = useContent()
+
+  const etiquetas = ubicacion.etiquetas ?? {}
+  const DETAILS = [
+    { icon: MapPin, label: etiquetas.calle, value: ADDRESS.street },
+    { icon: Building2, label: etiquetas.sector, value: ADDRESS.area },
+    { icon: Navigation, label: etiquetas.referencia, value: ADDRESS.reference },
+  ].filter((d) => d.value)
+
   return (
     <section
       id="ubicacion"
@@ -24,9 +27,9 @@ export default function Location() {
           <div>
             <SectionHeading
               id="ubicacion-titulo"
-              eyebrow="Ubicación"
-              title="Visítanos en el Centro de Medellín"
-              subtitle="Estamos en pleno centro, con atención directa para negocios, talleres y emprendedores."
+              eyebrow={ubicacion.eyebrow}
+              title={ubicacion.titulo}
+              subtitle={ubicacion.subtitulo}
             />
 
             <ul className="mt-10 space-y-3">
@@ -54,7 +57,7 @@ export default function Location() {
 
             <Reveal delay={280} className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button href={MAPS.directions} variant="navy" size="lg" icon={Navigation}>
-                Cómo llegar
+                {ubicacion.ctaComoLlegar}
               </Button>
               <Button
                 href={waLink(WA_MESSAGES.location)}
@@ -62,7 +65,7 @@ export default function Location() {
                 size="lg"
                 icon={WhatsAppIcon}
               >
-                Escribir por WhatsApp
+                {ubicacion.ctaWhatsapp}
               </Button>
             </Reveal>
           </div>
@@ -72,7 +75,7 @@ export default function Location() {
             <div className="relative overflow-hidden rounded-3xl border border-line shadow-lift">
               <div className="aspect-4/3 w-full bg-navy-50 sm:aspect-16/12 lg:aspect-square">
                 <iframe
-                  title={`Mapa de la ubicación de Mundo Importaciones S.A.S. en ${ADDRESS.full}`}
+                  title={`Mapa de la ubicación de ${COMPANY.legalName} en ${ADDRESS.full}`}
                   src={MAPS.embed}
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -88,7 +91,7 @@ export default function Location() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-display text-sm font-extrabold text-ink">
-                      Mundo Importaciones S.A.S.
+                      {COMPANY.legalName}
                     </p>
                     <p className="truncate text-xs text-body">
                       {ADDRESS.street} · {ADDRESS.area}
