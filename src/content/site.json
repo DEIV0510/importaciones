@@ -1,8 +1,7 @@
 {
   "version": 1,
-  "actualizado": null,
-  "actualizadoPor": null,
-
+  "actualizado": "2026-10-28T00:30:33.137Z",
+  "actualizadoPor": "admin",
   "identidad": {
     "nombreLegal": "MUNDO IMPORTACIONES S.A.S.",
     "nombreCorto": "Mundo Importaciones",
@@ -12,11 +11,18 @@
     "logo": "logo",
     "cargaTexto": "Importación · Distribución"
   },
-
   "contacto": {
     "telefonos": [
-      { "id": "tel-1", "display": "350 276 8542", "wa": "573502768542" },
-      { "id": "tel-2", "display": "305 391 9202", "wa": "573053919202" }
+      {
+        "id": "tel-1",
+        "display": "350 276 8542",
+        "wa": "573502768542"
+      },
+      {
+        "id": "tel-2",
+        "display": "305 391 9202",
+        "wa": "573053919202"
+      }
     ],
     "redes": [
       {
@@ -53,7 +59,6 @@
       "tooltip": "Escríbenos por WhatsApp"
     }
   },
-
   "ubicacion": {
     "visible": true,
     "eyebrow": "Ubicación",
@@ -75,34 +80,69 @@
     "ctaComoLlegar": "Cómo llegar",
     "ctaWhatsapp": "Escribir por WhatsApp"
   },
-
   "navegacion": {
     "enlaces": [
-      { "id": "nav-inicio", "href": "#inicio", "label": "Inicio", "visible": true },
-      { "id": "nav-productos", "href": "#productos", "label": "Productos", "visible": true },
-      { "id": "nav-catalogo", "href": "#catalogo", "label": "Catálogo", "visible": true },
-      { "id": "nav-soluciones", "href": "#soluciones", "label": "Soluciones", "visible": true },
-      { "id": "nav-contacto", "href": "#contacto", "label": "Contacto", "visible": true }
+      {
+        "id": "nav-inicio",
+        "href": "#inicio",
+        "label": "Inicio",
+        "visible": true
+      },
+      {
+        "id": "nav-productos",
+        "href": "#productos",
+        "label": "Productos",
+        "visible": true
+      },
+      {
+        "id": "nav-catalogo",
+        "href": "#catalogo",
+        "label": "Catálogo",
+        "visible": true
+      },
+      {
+        "id": "nav-soluciones",
+        "href": "#soluciones",
+        "label": "Soluciones",
+        "visible": true
+      },
+      {
+        "id": "nav-contacto",
+        "href": "#contacto",
+        "label": "Contacto",
+        "visible": true
+      }
     ],
     "ctaTexto": "Solicitar cotización",
     "barraSuperior": true
   },
-
   "hero": {
     "chip": "Importación",
     "chipTexto": "Distribución para talleres, fábricas y emprendimientos",
-    "tituloAntes": "Todo lo que tu taller, ",
+    "tituloAntes": "Todo lo que tu taller,",
     "tituloDestacado": "fábrica",
-    "tituloDespues": " o emprendimiento necesita.",
+    "tituloDespues": "o emprendimiento necesita.",
     "subtitulo": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas.",
     "ctaPrimario": "Solicitar cotización",
     "ctaSecundario": "Ver productos",
     "ctaSecundarioHref": "#productos",
     "mostrarDireccion": true,
     "pilares": [
-      { "id": "pil-1", "icono": "Scissors", "texto": "Confección" },
-      { "id": "pil-2", "icono": "PackageCheck", "texto": "Marroquinería y calzado" },
-      { "id": "pil-3", "icono": "Wrench", "texto": "Repuestos de máquina" }
+      {
+        "id": "pil-1",
+        "icono": "Scissors",
+        "texto": "Confección"
+      },
+      {
+        "id": "pil-2",
+        "icono": "PackageCheck",
+        "texto": "Marroquinería y calzado"
+      },
+      {
+        "id": "pil-3",
+        "icono": "Wrench",
+        "texto": "Repuestos de máquina"
+      }
     ],
     "vitrina": [
       {
@@ -142,7 +182,6 @@
       }
     ]
   },
-
   "marquesina": {
     "visible": true,
     "items": [
@@ -158,7 +197,6 @@
       "Metros de modistería"
     ]
   },
-
   "categoriasSeccion": {
     "visible": true,
     "eyebrow": "Nuestras líneas",
@@ -166,7 +204,6 @@
     "subtitulo": "Insumos, repuestos y equipos para confección, calzado y marroquinería. Elige una línea y mira lo que tenemos disponible.",
     "ctaTarjeta": "Ver productos"
   },
-
   "catalogoSeccion": {
     "visible": true,
     "eyebrow": "Catálogo",
@@ -188,7 +225,6 @@
       "cta": "Escríbenos por WhatsApp"
     }
   },
-
   "soluciones": {
     "visible": true,
     "eyebrow": "Para quién trabajamos",
@@ -234,7 +270,6 @@
       }
     ]
   },
-
   "contactoSeccion": {
     "visible": true,
     "eyebrow": "Contacto",
@@ -243,7 +278,6 @@
     "etiquetaLlamar": "¿Prefieres llamar?",
     "etiquetaRedes": "Síguenos"
   },
-
   "ctaFinal": {
     "visible": true,
     "chip": "Mundo Importaciones S.A.S.",
@@ -251,9 +285,12 @@
     "texto": "Conoce nuestro portafolio y comunícate con Mundo Importaciones.",
     "ctaPrimario": "Solicitar cotización",
     "ctaSecundario": "Ver productos",
-    "imagenes": ["cinta-faya-clasica", "carnaza-natural", "bobinas"]
+    "imagenes": [
+      "cinta-faya-clasica",
+      "carnaza-natural",
+      "bobinas"
+    ]
   },
-
   "pie": {
     "descripcion": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas. Todo lo que tu taller, fábrica o emprendimiento necesita.",
     "tituloNavegacion": "Navegación",
@@ -264,15 +301,13 @@
     "volverArriba": "Volver arriba",
     "avisoLegal": ""
   },
-
   "seo": {
     "titulo": "Mundo Importaciones S.A.S. | Insumos de confección, calzado y marroquinería en Medellín",
     "descripcion": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas en el Centro de Medellín. Cintas, elásticos, carnaza, millaré, lámparas y máquinas cortadoras.",
-    "url": "https://importaciones-olive.vercel.app",
+    "url": "https://importaciones-olive.vercel.app/",
     "ogImagen": "/og-image.jpg",
     "indexar": true
   },
-
   "tema": {
     "colores": {
       "navy-950": "#04213e",
@@ -301,14 +336,34 @@
     },
     "radio": "1rem"
   },
-
   "secciones": [
-    { "id": "hero", "visible": true },
-    { "id": "marquesina", "visible": true },
-    { "id": "productos", "visible": true },
-    { "id": "soluciones", "visible": true },
-    { "id": "ubicacion", "visible": true },
-    { "id": "contacto", "visible": true },
-    { "id": "ctaFinal", "visible": true }
+    {
+      "id": "hero",
+      "visible": true
+    },
+    {
+      "id": "marquesina",
+      "visible": true
+    },
+    {
+      "id": "productos",
+      "visible": true
+    },
+    {
+      "id": "soluciones",
+      "visible": true
+    },
+    {
+      "id": "ubicacion",
+      "visible": true
+    },
+    {
+      "id": "contacto",
+      "visible": true
+    },
+    {
+      "id": "ctaFinal",
+      "visible": true
+    }
   ]
 }
