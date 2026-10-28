@@ -30,8 +30,9 @@ function exigirAlmacen() {
   if (!enGitHub() && enServidor()) {
     throw new ErrorHttp(
       503,
-      'El panel no puede guardar: falta GITHUB_TOKEN en el servidor. ' +
-        'Sin él no hay dónde escribir, porque el disco de Vercel es de solo lectura.'
+      'Falta GITHUB_TOKEN en el servidor. El contenido vive en el repositorio, ' +
+        'así que sin ese token el panel no puede ni leerlo ni publicar. ' +
+        'Añádelo en Vercel → Settings → Environment Variables.'
     )
   }
 }

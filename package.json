@@ -12,7 +12,8 @@
     "qa": "node qa/contenido.mjs && node qa/publico.mjs && node qa/admin.mjs",
     "admin:hash": "node scripts/hash-contrasena.mjs",
     "qa:admin": "node qa/admin.mjs",
-    "qa:contenido": "node qa/contenido.mjs"
+    "qa:contenido": "node qa/contenido.mjs",
+    "qa:produccion": "node qa/produccion.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.33.0",
