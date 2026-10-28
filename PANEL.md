@@ -105,6 +105,27 @@ repositorio**, no una tabla que haya que mantener.
   una traba, no una garantía. La garantía es el hash.
 - **El panel no se indexa:** `X-Robots-Tag: noindex` en `/admin`.
 
+### Cambiar la contraseña
+
+```bash
+npm run admin:hash -- "la-nueva-contraseña"
+```
+
+Después, en Vercel → *Settings* → *Environment Variables*:
+
+1. **Borra** `ADMIN_PASSWORD_HASH`.
+2. Créala de nuevo con el hash que imprimió el comando.
+3. Redespliega (basta con un push a `main`).
+
+> El primer paso no es opcional. `vercel env add --force` **no** reemplaza el
+> valor existente y la CLI no se queja: dice que la añadió y deja el anterior.
+> Si solo haces `add`, el panel seguirá aceptando la contraseña vieja sin que
+> nadie lo note. Compruébalo entrando de verdad, o con `npm run qa:produccion`.
+
+El comando rechaza menos de 8 caracteres y avisa por debajo de 12. La longitud
+importa más que los símbolos: tres palabras unidas por guiones resisten mejor
+un diccionario que «Palabra2026*».
+
 ---
 
 ## 4. Uso diario
