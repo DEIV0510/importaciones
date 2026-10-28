@@ -24,13 +24,27 @@ const LIMITES = {
 }
 
 /** Quita caracteres de control que no pintan nada y solo sirven para colar cosas. */
-function limpiar(valor) {
+function limpiarSinRecortar(valor) {
   // eslint-disable-next-line no-control-regex
-  return String(valor ?? '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').trim()
+  return String(valor ?? '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
 }
 
-export function texto(valor, { max = LIMITES.textoMedio, campo = '', obligatorio = false } = {}) {
-  const limpio = limpiar(valor)
+function limpiar(valor) {
+  return limpiarSinRecortar(valor).trim()
+}
+
+/**
+ * @param {object} [opciones]
+ * @param {boolean} [opciones.espacios]  Conserva los espacios de los extremos.
+ *   Hace falta en las dos partes laterales del titular: ahí el autor decide
+ *   dónde va el espacio alrededor de la palabra destacada, y recortarlo pega
+ *   las palabras entre sí («taller,fábricao emprendimiento»).
+ */
+export function texto(
+  valor,
+  { max = LIMITES.textoMedio, campo = '', obligatorio = false, espacios = false } = {}
+) {
+  const limpio = espacios ? limpiarSinRecortar(valor) : limpiar(valor)
   if (obligatorio && !limpio) throw new ErrorValidacion('No puede quedar vacío.', campo)
   if (limpio.length > max) {
     throw new ErrorValidacion(`Máximo ${max} caracteres (van ${limpio.length}).`, campo)
@@ -253,9 +267,9 @@ export function validarSite(entrada) {
     hero: {
       chip: texto(h.chip, { max: 30 }),
       chipTexto: texto(h.chipTexto, { max: LIMITES.textoCorto }),
-      tituloAntes: texto(h.tituloAntes, { max: LIMITES.textoCorto }),
+      tituloAntes: texto(h.tituloAntes, { max: LIMITES.textoCorto, espacios: true }),
       tituloDestacado: texto(h.tituloDestacado, { max: 60 }),
-      tituloDespues: texto(h.tituloDespues, { max: LIMITES.textoCorto }),
+      tituloDespues: texto(h.tituloDespues, { max: LIMITES.textoCorto, espacios: true }),
       subtitulo: texto(h.subtitulo, { max: LIMITES.textoMedio }),
       ctaPrimario: texto(h.ctaPrimario, { max: 40 }),
       ctaSecundario: texto(h.ctaSecundario, { max: 40 }),

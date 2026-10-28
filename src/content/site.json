@@ -119,9 +119,9 @@
   "hero": {
     "chip": "Importación",
     "chipTexto": "Distribución para talleres, fábricas y emprendimientos",
-    "tituloAntes": "Todo lo que tu taller,",
+    "tituloAntes": "Todo lo que tu taller, ",
     "tituloDestacado": "fábrica",
-    "tituloDespues": "o emprendimiento necesita.",
+    "tituloDespues": " o emprendimiento necesita.",
     "subtitulo": "Importamos y distribuimos insumos de confección, calzado, marroquinería y repuestos para máquinas.",
     "ctaPrimario": "Solicitar cotización",
     "ctaSecundario": "Ver productos",

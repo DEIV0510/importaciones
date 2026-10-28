@@ -38,6 +38,43 @@ try {
 
 const idsMediosLogo = new Set(medios.map((m) => m.id))
 
+/**
+ * Validar no debe cambiar el contenido.
+ *
+ * Esto nació de un fallo real: `texto()` hacía trim() a todo, y eso se comió
+ * los espacios de los extremos del titular. El resultado en vivo fue
+ * «taller,fábricao emprendimiento». Como el panel valida en cada publicación,
+ * un validador que altera valores los corrompe poco a poco, publicación tras
+ * publicación, sin que nadie toque esos campos.
+ */
+if (validado) {
+  const sinSello = (s) => {
+    const copia = JSON.parse(JSON.stringify(s))
+    delete copia.actualizado
+    delete copia.actualizadoPor
+    return copia
+  }
+
+  const diferencias = []
+  const comparar = (a, b, ruta = '') => {
+    for (const k of new Set([...Object.keys(a ?? {}), ...Object.keys(b ?? {})])) {
+      const r = ruta ? `${ruta}.${k}` : k
+      const va = a?.[k]
+      const vb = b?.[k]
+      if (va && vb && typeof va === 'object' && typeof vb === 'object') comparar(va, vb, r)
+      else if (JSON.stringify(va) !== JSON.stringify(vb)) {
+        diferencias.push(`${r}: ${JSON.stringify(va)} → ${JSON.stringify(vb)}`)
+      }
+    }
+  }
+  comparar(sinSello(site), sinSello(validado.site))
+  comparar(categorias, validado.cats)
+  comparar(productos, validado.prods)
+
+  inf.check('Validar no altera el contenido publicado', diferencias.length === 0,
+    diferencias.slice(0, 4).join(' · '))
+}
+
 // -------------------------------------------------- las imágenes existen ---
 const EXT = { sm: 'webp', lg: 'webp', fallback: 'png', hero: 'webp' }
 
