@@ -27,3 +27,10 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+.vercel
+
+# Credenciales y artefactos locales del panel
+CREDENCIALES-PANEL.txt
+.tmp-env/
+.vercel

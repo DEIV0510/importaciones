@@ -17,6 +17,25 @@ const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
 export const enGitHub = () => git.usaGitHub()
 
+/** ¿Estamos en el servidor de Vercel y no en una máquina de desarrollo? */
+const enServidor = () => Boolean(process.env.VERCEL)
+
+/**
+ * El modo local escribe en el disco, y eso solo tiene sentido desarrollando.
+ * El sistema de archivos de Vercel es de solo lectura y además efímero: sin
+ * GITHUB_TOKEN no hay dónde guardar, así que conviene decirlo con claridad en
+ * lugar de dejar que falle al escribir con un error que no explica nada.
+ */
+function exigirAlmacen() {
+  if (!enGitHub() && enServidor()) {
+    throw new ErrorHttp(
+      503,
+      'El panel no puede guardar: falta GITHUB_TOKEN en el servidor. ' +
+        'Sin él no hay dónde escribir, porque el disco de Vercel es de solo lectura.'
+    )
+  }
+}
+
 /** Evita que una ruta manipulada escriba fuera del proyecto. */
 function rutaSegura(ruta) {
   if (typeof ruta !== 'string' || !ruta) throw new ErrorHttp(400, 'Ruta vacía.')
@@ -32,11 +51,13 @@ function rutaSegura(ruta) {
 }
 
 export async function leer(ruta, ref) {
+  exigirAlmacen()
   if (enGitHub()) return git.leerArchivo(ruta, ref)
   return fs.readFile(rutaSegura(ruta), 'utf8')
 }
 
 export async function escribir(archivos, mensaje, autor, shaEsperado) {
+  exigirAlmacen()
   archivos.forEach((a) => rutaSegura(a.ruta))
 
   if (enGitHub()) return git.escribirArchivos(archivos, mensaje, autor, shaEsperado)
@@ -62,6 +83,7 @@ export async function escribir(archivos, mensaje, autor, shaEsperado) {
 }
 
 export async function borrar(rutas, mensaje, autor) {
+  exigirAlmacen()
   rutas.forEach(rutaSegura)
   if (enGitHub()) return git.borrarArchivos(rutas, mensaje, autor)
   for (const ruta of rutas) await fs.rm(rutaSegura(ruta), { force: true })
@@ -79,6 +101,7 @@ export async function sha() {
 }
 
 export async function historial(ruta, limite = 30) {
+  exigirAlmacen()
   if (enGitHub()) return git.historial(ruta, limite)
   try {
     const { stdout } = await ejecutar(
