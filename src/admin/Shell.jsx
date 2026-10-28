@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import {
-  Eye, History, Image, LayoutGrid, LogOut, Menu, Palette, Rocket,
-  RotateCcw, Settings, Share2, Sparkles, X,
+  AlertCircle, Eye, HelpCircle, History, Image, LayoutGrid, LogOut, Menu,
+  Palette, Rocket, Settings, Share2, Sparkles, X,
 } from 'lucide-react'
 import { api } from './api'
 import { useEditor } from './estado'
 import { Avisos, Boton, Confirmar, claseInput } from './ui'
 import Previsualizacion from './Previsualizacion'
+import Guia, { guiaYaVista } from './Guia'
 import Identidad from './secciones/Identidad'
 import Navegacion from './secciones/Navegacion'
 import Portada from './secciones/Portada'
@@ -44,6 +45,9 @@ export default function Shell({ usuario, onSalir }) {
   const [confirmarDescartar, setConfirmarDescartar] = useState(false)
   const [publicando, setPublicando] = useState(false)
   const [nota, setNota] = useState('')
+  // La primera vez se abre sola: pedirle a alguien que busque el botón de
+  // ayuda antes de saber que existe no funciona.
+  const [guiaAbierta, setGuiaAbierta] = useState(() => !guiaYaVista())
 
   const actual = APARTADOS.find((a) => a.id === apartado)
 
@@ -101,21 +105,55 @@ export default function Shell({ usuario, onSalir }) {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            {sucio && (
-              <span className="hidden rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 sm:inline">
-                Cambios sin publicar
-              </span>
-            )}
+            <Boton
+              variante="fantasma"
+              icono={HelpCircle}
+              onClick={() => setGuiaAbierta(true)}
+              aria-label="Cómo funciona el panel"
+              title="Cómo funciona el panel"
+              className="!px-2"
+            />
             <Boton icono={Eye} onClick={() => setPrevisualizando(true)} className="max-sm:!px-2">
               <span className="max-sm:hidden">Previsualizar</span>
             </Boton>
-            <Boton variante="primario" icono={Rocket} disabled={!sucio}
-              onClick={() => setPublicando(true)} className="max-sm:!px-2">
+            {/* El title explica por qué está apagado: un botón gris sin
+                explicación es la forma más rápida de que alguien se atasque. */}
+            <Boton
+              variante="primario"
+              icono={Rocket}
+              disabled={!sucio}
+              title={sucio ? 'Publicar los cambios en el sitio' : 'No hay cambios nuevos que publicar'}
+              onClick={() => setPublicando(true)}
+              className="max-sm:!px-2"
+            >
               <span className="max-sm:hidden">Publicar</span>
             </Boton>
             <Boton variante="fantasma" icono={LogOut} onClick={salir} aria-label="Cerrar sesión" className="!px-2" />
           </div>
         </div>
+
+        {/* Banda de cambios sin publicar.
+            Antes era una pastilla pequeña que se perdía entre los botones, y
+            justo es lo que nadie debe pasar por alto: sin publicar, el sitio
+            sigue igual. */}
+        {sucio && (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-amber-200 bg-amber-50 px-4 py-2.5">
+            <span className="flex items-center gap-2 text-sm font-semibold text-amber-900">
+              <AlertCircle className="size-4 shrink-0" aria-hidden="true" />
+              Tienes cambios sin publicar
+            </span>
+            <span className="text-sm text-amber-800">
+              Solo los ves tú. El sitio no cambia hasta que pulses Publicar.
+            </span>
+            <button
+              type="button"
+              onClick={() => setConfirmarDescartar(true)}
+              className="ml-auto rounded-lg px-2 py-1 text-sm font-semibold text-amber-900 underline underline-offset-2 hover:bg-amber-100"
+            >
+              Descartar
+            </button>
+          </div>
+        )}
       </header>
 
       <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6">
@@ -154,18 +192,20 @@ export default function Shell({ usuario, onSalir }) {
               })}
             </ul>
 
-            {sucio && (
-              <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
-                <p className="text-xs text-amber-900">
-                  Tienes cambios guardados solo en este navegador. Publícalos para que los vean
-                  los visitantes.
-                </p>
-                <Boton icono={RotateCcw} className="mt-2 w-full !py-1.5 text-xs"
-                  onClick={() => setConfirmarDescartar(true)}>
-                  Descartar cambios
-                </Boton>
-              </div>
-            )}
+            {/* El aviso de cambios sin publicar vive en la banda de arriba,
+                que se ve siempre. Aquí abajo queda el acceso a la guía. */}
+            <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3">
+              <p className="text-xs text-slate-600">
+                ¿Dudas con algo? Abre la guía y repasa cómo funciona el panel en un minuto.
+              </p>
+              <Boton
+                icono={HelpCircle}
+                className="mt-2 w-full !py-1.5 text-xs"
+                onClick={() => setGuiaAbierta(true)}
+              >
+                Cómo funciona
+              </Boton>
+            </div>
           </nav>
         </aside>
 
@@ -178,6 +218,8 @@ export default function Shell({ usuario, onSalir }) {
           <actual.Componente />
         </main>
       </div>
+
+      {guiaAbierta && <Guia onCerrar={() => setGuiaAbierta(false)} />}
 
       {previsualizando && <Previsualizacion onCerrar={() => setPrevisualizando(false)} />}
 

@@ -134,7 +134,7 @@ export function EditorProvider({ usuario, children }) {
         avisar(
           res.local
             ? 'Guardado en el disco local (modo desarrollo).'
-            : 'Publicado. El sitio se actualiza en aproximadamente un minuto.'
+            : 'Publicado. El sitio se está reconstruyendo: espera cerca de un minuto y recárgalo.'
         )
         return true
       } catch (err) {

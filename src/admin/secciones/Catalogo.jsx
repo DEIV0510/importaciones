@@ -175,13 +175,11 @@ function Productos() {
 
             {abierto === i && (
               <div className="grid gap-4 border-t border-slate-200 bg-slate-50/60 p-4">
-                <Fila>
-                  <Texto ruta={`products.${i}.nombre`} etiqueta="Nombre" max={80} />
-                  <Campo etiqueta="Identificador" ayuda="Se usa internamente. Cámbialo solo si sabes lo que haces.">
-                    <input className={claseInput} value={p.id}
-                      onChange={(e) => set(`products.${i}.id`, idDesde(e.target.value))} />
-                  </Campo>
-                </Fila>
+                {/* El identificador se muestra, pero no se edita: a quien
+                    administra el sitio no le sirve de nada cambiarlo y sí
+                    puede confundirlo con el nombre que ven los clientes. */}
+                <Texto ruta={`products.${i}.nombre`} etiqueta="Nombre" max={80}
+                  ayuda={`Es lo que ven tus clientes. Referencia interna: ${p.id}`} />
 
                 <Area ruta={`products.${i}.descripcion`} etiqueta="Descripción" max={400} filas={2}
                   ayuda="Déjala vacía si no hay información confirmada: el sitio mostrará «Consulta disponibilidad»." />

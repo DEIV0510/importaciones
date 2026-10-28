@@ -206,6 +206,57 @@ try {
   r = await pedir('/api/content')
   inf.check('Tras salir ya no se puede leer el contenido', r.estado === 401, `HTTP ${r.estado}`)
 
+  // ------------------------------------------------------------ guía -----
+  // Contexto nuevo = primera visita: la guía debe salir sola.
+  {
+    const ctxNuevo = await navegador.newContext({ viewport: { width: 1280, height: 900 }, locale: 'es-CO' })
+    const p2 = await ctxNuevo.newPage()
+    await p2.goto(BASE + '/admin', { waitUntil: 'networkidle' })
+    await p2.fill('#usuario', 'admin')
+    await p2.fill('#contrasena', CONTRASENA)
+    await p2.click('button[type="submit"]')
+    await p2.waitForTimeout(2600)
+
+    const guia = p2.locator('[aria-labelledby="guia-titulo"]')
+    inf.check('La guía se abre sola la primera vez', await guia.isVisible())
+
+    const pasos = await p2.locator('text=/Cómo funciona el panel · 1 de /').isVisible()
+    inf.check('La guía indica en qué paso vas', pasos)
+
+    // Recorre todos los pasos
+    let avances = 0
+    while (await p2.locator('button:has-text("Siguiente")').isVisible()) {
+      await p2.locator('button:has-text("Siguiente")').click()
+      await p2.waitForTimeout(220)
+      if (++avances > 10) break
+    }
+    inf.check('Se puede avanzar por toda la guía', avances >= 3, `${avances + 1} pasos`)
+    inf.check('El último paso cierra la guía', await p2.locator('button:has-text("Entendido")').isVisible())
+
+    await p2.locator('button:has-text("Entendido")').click()
+    await p2.waitForTimeout(400)
+    inf.check('La guía se cierra', (await p2.locator('[aria-labelledby="guia-titulo"]').count()) === 0)
+
+    // Al recargar no debe volver a salir
+    await p2.reload({ waitUntil: 'networkidle' })
+    await p2.waitForTimeout(2600)
+    inf.check('No vuelve a salir sola tras verla',
+      (await p2.locator('[aria-labelledby="guia-titulo"]').count()) === 0)
+
+    // Pero el botón de ayuda la reabre
+    await p2.locator('button[aria-label="Cómo funciona el panel"]').click()
+    await p2.waitForTimeout(400)
+    inf.check('El botón de ayuda la reabre',
+      await p2.locator('[aria-labelledby="guia-titulo"]').isVisible())
+
+    await p2.keyboard.press('Escape')
+    await p2.waitForTimeout(350)
+    inf.check('La guía cierra con Escape',
+      (await p2.locator('[aria-labelledby="guia-titulo"]').count()) === 0)
+
+    await ctxNuevo.close()
+  }
+
   // ------------------------------------------------------- responsive ----
   await page.goto(BASE + '/admin', { waitUntil: 'networkidle' })
   await page.fill('#usuario', 'admin')
