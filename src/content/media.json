@@ -102,6 +102,18 @@
     "origen": "panel"
   },
   {
+    "id": "coleccion-de-rollos-de-cinta-satinada-multicolor",
+    "alt": "",
+    "variantes": [
+      "sm",
+      "lg",
+      "fallback",
+      "hero"
+    ],
+    "bytes": 649452,
+    "origen": "panel"
+  },
+  {
     "id": "cortadora-compacta",
     "alt": "Cortadora compacta",
     "variantes": [
