@@ -90,6 +90,18 @@
     "origen": "inicial"
   },
   {
+    "id": "coleccion-de-herramientas-para-marroquineria",
+    "alt": "",
+    "variantes": [
+      "sm",
+      "lg",
+      "fallback",
+      "hero"
+    ],
+    "bytes": 590237,
+    "origen": "panel"
+  },
+  {
     "id": "cortadora-compacta",
     "alt": "Cortadora compacta",
     "variantes": [
