@@ -98,6 +98,10 @@ if (!clave) {
     inf.check('Con sesión lee el contenido', r.estado === 200,
       r.estado === 200 ? `${r.datos?.products?.length ?? 0} productos` : (r.datos?.error ?? `HTTP ${r.estado}`))
     inf.check('El contenido trae el identificador de versión', Boolean(r.datos?.sha))
+    inf.check('Los productos traen el campo de precio (null si no hay)',
+      (r.datos?.products ?? []).length > 0 &&
+      r.datos.products.every((p) => 'precio' in p && 'precioUnidad' in p),
+      `${(r.datos?.products ?? []).filter((p) => p.precio).length} con precio`)
 
     r = await pedir('/api/content', { cookie: galleta, sinCabecera: true })
     inf.check('Sin la cabecera del panel rechaza aunque haya sesión', r.estado === 403, `HTTP ${r.estado}`)
