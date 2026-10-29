@@ -12,6 +12,8 @@
       "cinta-faya-rosada"
     ],
     "descripcion": "Cinta faya de textura acanalada, disponible en varios colores. Consulta los tonos y anchos disponibles.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 0
@@ -29,6 +31,8 @@
       "cinta-raso-roja"
     ],
     "descripcion": "Cinta raso de acabado satinado, disponible en varios colores. Consulta los tonos y anchos disponibles.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 1
@@ -46,6 +50,8 @@
       "millare-plata"
     ],
     "descripcion": "Pasamanería tipo millaré para apliques y terminaciones decorativas.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 2
@@ -60,6 +66,8 @@
     "imagen": "millare-navideno",
     "galeria": null,
     "descripcion": "Millaré en combinación de colores navideños para trabajos de temporada.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 3
@@ -78,6 +86,8 @@
       "elastico-espigado"
     ],
     "descripcion": "Elásticos con diseño estampado en distintos anchos y combinaciones de color.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 4
@@ -95,6 +105,8 @@
       "elastico-plano-negro"
     ],
     "descripcion": "Elástico plano en presentación de rollo, en blanco y negro.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 5
@@ -111,6 +123,8 @@
       "carnaza-blanca"
     ],
     "descripcion": "Tira de carnaza en rollo para trabajos de marroquinería, calzado y accesorios.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 6
@@ -124,6 +138,8 @@
     "imagen": "prensatelas",
     "galeria": null,
     "descripcion": "Prensatelas de repuesto para máquina de confección.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": false,
     "visible": true,
     "orden": 7
@@ -137,6 +153,8 @@
     "imagen": "bobinas",
     "galeria": null,
     "descripcion": "Bobinas metálicas para máquina de confección, en caja.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 8
@@ -150,6 +168,8 @@
     "imagen": "aceitera",
     "galeria": null,
     "descripcion": "Aceitera para lubricación y mantenimiento de máquinas.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": false,
     "visible": true,
     "orden": 9
@@ -163,6 +183,8 @@
     "imagen": "repuesto-metalico",
     "galeria": null,
     "descripcion": "Piezas y repuestos para máquinas de confección. Consúltanos la referencia que necesitas.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": false,
     "visible": true,
     "orden": 10
@@ -179,6 +201,8 @@
       "cortadora-industrial"
     ],
     "descripcion": "Máquina cortadora de disco para corte de tela. Consulta los modelos disponibles.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 11
@@ -198,6 +222,8 @@
       "lampara-led-compacta"
     ],
     "descripcion": "Lámpara LED de brazo flexible para iluminar el área de trabajo de la máquina. Consulta los modelos disponibles.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": true,
     "visible": true,
     "orden": 12
@@ -211,6 +237,8 @@
     "imagen": "lampara-led-modulo",
     "galeria": null,
     "descripcion": "Módulo de iluminación LED tipo barra para puesto de trabajo.",
+    "precio": null,
+    "precioUnidad": null,
     "destacado": false,
     "visible": true,
     "orden": 13
@@ -225,6 +253,8 @@
     "imagen": null,
     "galeria": null,
     "descripcion": null,
+    "precio": null,
+    "precioUnidad": null,
     "destacado": false,
     "visible": true,
     "orden": 14
@@ -239,6 +269,8 @@
     "imagen": null,
     "galeria": null,
     "descripcion": null,
+    "precio": null,
+    "precioUnidad": null,
     "destacado": false,
     "visible": true,
     "orden": 15

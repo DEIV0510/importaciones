@@ -7,6 +7,8 @@
  * real sin duplicar un solo componente.
  */
 
+import { formatearPrecio } from './formato'
+
 const WA_BASE = 'https://wa.me/'
 
 /** Sustituye marcadores tipo {producto} sin ejecutar nada. */
@@ -90,6 +92,9 @@ export function derive(site, categorias, productos) {
       image: p.imagen || null,
       gallery: p.galeria?.length ? p.galeria : null,
       description: p.descripcion || null,
+      // Sin precio válido no se muestra nada: ni «$0» ni un hueco.
+      priceLabel: formatearPrecio(p.precio) || null,
+      priceUnit: formatearPrecio(p.precio) && p.precioUnidad ? p.precioUnidad : null,
       featured: Boolean(p.destacado),
     }))
 

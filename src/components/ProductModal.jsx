@@ -180,12 +180,30 @@ export default function ProductModal({ product, onClose }) {
               </ul>
             )}
 
-            <div className="mt-6 rounded-2xl border border-line bg-shell p-4">
-              <p className="text-sm leading-relaxed text-body">
-                No publicamos precios en línea. Escríbenos por WhatsApp y te confirmamos{' '}
-                <strong className="font-semibold text-ink">disponibilidad y condiciones</strong>.
-              </p>
-            </div>
+            {/* Con precio: el precio y su nota. Sin precio: la nota general, que
+                invita a consultarlo. Si el texto queda vacío en el panel, no se
+                pinta una caja vacía. */}
+            {product.priceLabel ? (
+              <div className="mt-6 rounded-2xl border border-line bg-shell p-4">
+                <p className="flex flex-wrap items-baseline gap-x-2 text-ink">
+                  <span className="font-display text-3xl leading-none font-extrabold">
+                    {product.priceLabel}
+                  </span>
+                  {product.priceUnit && (
+                    <span className="text-sm font-semibold text-muted">{product.priceUnit}</span>
+                  )}
+                </p>
+                {catalogoSeccion.precioNota && (
+                  <p className="mt-2 text-sm leading-relaxed text-body">{catalogoSeccion.precioNota}</p>
+                )}
+              </div>
+            ) : (
+              catalogoSeccion.modalNota && (
+                <div className="mt-6 rounded-2xl border border-line bg-shell p-4">
+                  <p className="text-sm leading-relaxed text-body">{catalogoSeccion.modalNota}</p>
+                </div>
+              )
+            )}
 
             <div className="mt-6 grid gap-2.5">
               <Button

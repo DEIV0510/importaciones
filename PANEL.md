@@ -141,10 +141,39 @@ sin publicar.
 - Si otra persona publica mientras editas, el panel lo detecta y avisa en lugar
   de pisar su trabajo.
 
+### Precios
+
+Cada producto tiene un campo **Precio (pesos)** y otro, opcional, de **Unidad
+del precio** («por metro», «por rollo»…). El precio es un número entero en
+pesos colombianos; el panel quita puntos, comas y el signo `$` al escribir, y
+debajo muestra cómo lo verá el cliente (`$12.500 por metro`), que es la forma
+más rápida de notar un cero de más.
+
+- **Vacío = sin precio.** Ningún producto trae precio de fábrica: solo aparece
+  el que alguien escribe. Sin precio, la ficha invita a consultarlo por WhatsApp.
+- Con precio se ve en la tarjeta del catálogo y en la ficha. La unidad solo se
+  muestra si hay precio.
+- Dos textos se editan en *Catálogo → Textos*: la nota de la ficha **con**
+  precio y la de la ficha **sin** precio.
+- El servidor rechaza precios que no sean un entero mayor que 0 (hasta
+  999.999.999). «12.000» no se interpreta: como número daría 12, así que se
+  rechaza en lugar de adivinarlo.
+- Como el resto del texto, el precio no se ve en el sitio hasta que pulsas
+  *Publicar*.
+
 ### Imágenes
 
 Se suben y se borran **al instante**, sin esperar a publicar, porque son
 archivos y no texto.
+
+Se pueden subir desde tres sitios, con el mismo flujo: la sección *Imágenes*, el
+botón **Subir nueva** de «Foto principal» (la deja puesta al terminar) y
+**Subir foto nueva a la galería** (la añade a ella). Al subir desde un producto,
+el texto alternativo arranca con el nombre del producto.
+
+La ficha del producto muestra solo las fotos de su galería; si la galería está
+vacía, muestra la foto principal. Por eso, al cambiar la foto principal de un
+producto que ya tiene galería, conviene revisar también la galería.
 
 Tu navegador genera cuatro versiones antes de subir: dos para el catálogo, una
 de respaldo y otra para la vitrina de la portada. Por eso no se sube nada

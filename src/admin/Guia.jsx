@@ -45,7 +45,7 @@ const PASOS = [
     texto:
       'Las imágenes se suben y se borran al instante, sin esperar a publicar. Por eso aparecen de inmediato en la biblioteca.',
     detalle:
-      'Tu navegador las optimiza antes de subirlas, así que no hace falta que las prepares.',
+      'Puedes subirlas desde la ficha de cada producto («Subir nueva») o desde Imágenes. Tu navegador las optimiza antes, así que no hace falta que las prepares.',
   },
   {
     icono: History,

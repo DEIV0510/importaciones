@@ -113,7 +113,15 @@ export default function Shell({ usuario, onSalir }) {
               title="Cómo funciona el panel"
               className="!px-2"
             />
-            <Boton icono={Eye} onClick={() => setPrevisualizando(true)} className="max-sm:!px-2">
+            {/* En celular solo queda el icono: sin nombre, un lector de pantalla
+                lo anunciaba como «botón» a secas. */}
+            <Boton
+              icono={Eye}
+              onClick={() => setPrevisualizando(true)}
+              aria-label="Previsualizar"
+              title="Ver el sitio con tus cambios, antes de publicar"
+              className="max-sm:!px-2"
+            >
               <span className="max-sm:hidden">Previsualizar</span>
             </Boton>
             {/* El title explica por qué está apagado: un botón gris sin

@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
-import { Plus, Search, Star } from 'lucide-react'
+import { useId, useMemo, useState } from 'react'
+import { Plus, Search, Star, Upload } from 'lucide-react'
 import { useEditor } from '../estado'
-import { Miniatura, SelectorImagen } from '../medios'
+import { Miniatura, SelectorImagen, SubirImagenModal } from '../medios'
 import { Area, Boton, Campo, Fila, Interruptor, Lista, Panel, Texto, Vacio, claseInput } from '../ui'
+import { formatearPrecio } from '../../content/formato'
+import { PRECIO_MAXIMO } from '../../content/validacion'
 
 const sinAcentos = (s) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -67,10 +69,60 @@ function Categorias() {
 
 /* ========================================================================== */
 
+/**
+ * Precio de un producto, en pesos.
+ *
+ * Solo deja escribir cifras: lo que se pega con puntos, comas o el signo $ se
+ * limpia. Debajo se muestra tal como lo verá el cliente, que es la forma más
+ * rápida de notar un cero de más. Vacío = sin precio (el sitio invita a
+ * consultarlo).
+ */
+function CampoPrecio({ indice }) {
+  const { get, set } = useEditor()
+  const id = useId()
+  const ruta = `products.${indice}.precio`
+  const precio = get(ruta)
+  const unidad = get(`products.${indice}.precioUnidad`)
+
+  const alEscribir = (e) => {
+    const cifras = e.target.value.replace(/\D/g, '').slice(0, String(PRECIO_MAXIMO).length)
+    const n = Number(cifras)
+    set(ruta, n > 0 ? n : null)
+  }
+
+  const vista = formatearPrecio(precio)
+
+  return (
+    <Campo
+      etiqueta="Precio (pesos)"
+      id={id}
+      ayuda={
+        vista
+          ? `En el sitio se verá: ${vista}${unidad ? ` ${unidad}` : ''}`
+          : 'Déjalo vacío si no quieres publicar el precio: el sitio invitará a consultarlo por WhatsApp.'
+      }
+    >
+      <div className="relative">
+        <span aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-slate-400">$</span>
+        <input
+          id={id}
+          inputMode="numeric"
+          autoComplete="off"
+          className={`${claseInput} pl-7`}
+          value={precio ?? ''}
+          placeholder="Sin precio"
+          onChange={alEscribir}
+        />
+      </div>
+    </Campo>
+  )
+}
+
 function Productos() {
   const { productos, categorias, medios, set, avisar } = useEditor()
   const [busqueda, setBusqueda] = useState('')
   const [abierto, setAbierto] = useState(null)
+  const [subiendoGaleria, setSubiendoGaleria] = useState(null) // índice del producto
 
   const filtrados = useMemo(() => {
     const q = sinAcentos(busqueda.trim())
@@ -88,6 +140,8 @@ function Productos() {
       imagen: null,
       galeria: null,
       descripcion: null,
+      precio: null,
+      precioUnidad: null,
       destacado: false,
       visible: true,
       orden: productos.length,
@@ -161,6 +215,7 @@ function Productos() {
                 </span>
                 <span className="block truncate text-xs text-slate-500">
                   {(p.categorias ?? []).map((c) => categorias.find((x) => x.id === c)?.corto ?? c).join(' · ') || 'Sin línea'}
+                  {p.precio ? ` · ${formatearPrecio(p.precio)}` : ''}
                 </span>
               </button>
 
@@ -184,6 +239,13 @@ function Productos() {
                 <Area ruta={`products.${i}.descripcion`} etiqueta="Descripción" max={400} filas={2}
                   ayuda="Déjala vacía si no hay información confirmada: el sitio mostrará «Consulta disponibilidad»." />
 
+                <Fila>
+                  <CampoPrecio indice={i} />
+                  <Texto ruta={`products.${i}.precioUnidad`} etiqueta="Unidad del precio (opcional)" max={30}
+                    vacioANulo placeholder="por metro, por rollo, por unidad…"
+                    ayuda="Se muestra al lado del precio. Sin precio, no se muestra." />
+                </Fila>
+
                 <Campo etiqueta="Líneas a las que pertenece">
                   <div className="flex flex-wrap gap-2">
                     {categorias.map((c) => {
@@ -201,10 +263,15 @@ function Productos() {
                   </div>
                 </Campo>
 
-                <SelectorImagen ruta={`products.${i}.imagen`} etiqueta="Foto principal" permitirVacio />
+                <SelectorImagen ruta={`products.${i}.imagen`} etiqueta="Foto principal" permitirVacio
+                  altSugerido={p.nombre}
+                  ayuda="La que se ve en la tarjeta del catálogo." />
 
                 <Campo etiqueta="Galería"
-                  ayuda="Fotos extra que se pueden pasar dentro de la ficha. Si solo hay una, no se muestran flechas.">
+                  ayuda="Las fotos que se pueden pasar dentro de la ficha. Si la dejas vacía, la ficha muestra solo la foto principal; si solo hay una, no se muestran flechas.">
+                  <div>
+                    <Boton icono={Upload} onClick={() => setSubiendoGaleria(i)}>Subir foto nueva a la galería</Boton>
+                  </div>
                   <div className="grid max-h-56 grid-cols-4 gap-2 overflow-y-auto rounded-lg border border-slate-200 bg-white p-2 sm:grid-cols-6">
                     {medios.map((m) => {
                       const activa = (p.galeria ?? []).includes(m.id)
@@ -233,6 +300,19 @@ function Productos() {
           </li>
         ))}
       </ul>
+
+      {subiendoGaleria !== null && productos[subiendoGaleria] && (
+        <SubirImagenModal
+          altInicial={productos[subiendoGaleria].nombre}
+          onCerrar={() => setSubiendoGaleria(null)}
+          onSubida={(idImagen) => {
+            const i = subiendoGaleria
+            setSubiendoGaleria(null)
+            // Subir una foto desde la galería es querer verla en ella.
+            if (!(productos[i].galeria ?? []).includes(idImagen)) alternarGaleria(i, idImagen)
+          }}
+        />
+      )}
     </Panel>
   )
 }
@@ -273,7 +353,10 @@ function TextosCatalogo() {
         </Fila>
 
         <Area ruta="site.catalogoSeccion.sinDescripcion" etiqueta="Texto cuando falta la descripción" max={400} filas={2} />
-        <Area ruta="site.catalogoSeccion.modalNota" etiqueta="Nota sobre precios en la ficha" max={400} filas={2} />
+        <Area ruta="site.catalogoSeccion.modalNota" etiqueta="Nota en la ficha de un producto sin precio" max={400} filas={2}
+          ayuda="Déjala vacía si no quieres mostrar ninguna nota." />
+        <Area ruta="site.catalogoSeccion.precioNota" etiqueta="Nota en la ficha de un producto con precio" max={400} filas={2}
+          ayuda="Aparece debajo del precio. Déjala vacía si no quieres mostrar ninguna nota." />
         <Area ruta="site.catalogoSeccion.vacio" etiqueta="Texto cuando una línea no tiene productos" max={400} filas={2} />
       </Panel>
 

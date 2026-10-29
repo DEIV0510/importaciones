@@ -11,8 +11,9 @@ import { readFileSync, existsSync } from 'node:fs'
 import { crearInforme } from './lib.mjs'
 import {
   validarCategorias, validarMedios, validarProductos, validarSite, usosDeImagen,
-  anclasDisponibles,
+  anclasDisponibles, precio, PRECIO_MAXIMO,
 } from '../src/content/validacion.js'
+import { formatearPrecio } from '../src/content/formato.js'
 
 const leer = (f) => JSON.parse(readFileSync(`src/content/${f}`, 'utf8'))
 
@@ -148,5 +149,37 @@ if (validado) {
   inf.check('No inventa usos para una imagen libre',
     usosDeImagen('imagen-inexistente-xyz', { site, categorias, productos }).length === 0)
 }
+
+// ------------------------------------------------------------- precios ----
+// Ningún precio publicado lo puso nadie: hasta que el dueño los escriba, todos null.
+inf.check('Todos los productos traen precio y unidad (null si no hay)',
+  productos.every((p) => 'precio' in p && 'precioUnidad' in p))
+
+const aceptaPrecio = (v) => { try { return precio(v) } catch { return 'ERROR' } }
+inf.check('Sin precio es null', [null, undefined, ''].every((v) => aceptaPrecio(v) === null))
+inf.check('Acepta un entero en pesos', aceptaPrecio(12500) === 12500)
+inf.check('Acepta cifras en texto', aceptaPrecio('12500') === 12500)
+inf.check('Rechaza 0, negativos y decimales',
+  [0, -5, 12.5, '0', '-5', '12.5'].every((v) => aceptaPrecio(v) === 'ERROR'))
+// «12.000» daría 12 si se interpretara como número: debe rechazarse, no adivinarse
+inf.check('Rechaza «12.000» y «12,000» en lugar de leerlos mal',
+  ['12.000', '12,000', '$12000', '12 000', 'abc'].every((v) => aceptaPrecio(v) === 'ERROR'))
+inf.check('Rechaza un precio por encima del tope',
+  aceptaPrecio(PRECIO_MAXIMO + 1) === 'ERROR' && aceptaPrecio(PRECIO_MAXIMO) === PRECIO_MAXIMO)
+
+const muestra = (extra) => validarProductos([{ id: 'p', nombre: 'P', categorias: [], ...extra }])[0]
+inf.check('La unidad se descarta si no hay precio',
+  muestra({ precioUnidad: 'por metro' }).precioUnidad === null)
+inf.check('La unidad se conserva junto a un precio',
+  muestra({ precio: 3000, precioUnidad: 'por metro' }).precioUnidad === 'por metro')
+inf.check('Una unidad demasiado larga se rechaza', (() => {
+  try { muestra({ precio: 3000, precioUnidad: 'x'.repeat(31) }); return false } catch { return true }
+})())
+
+inf.check('El formato separa los miles con punto',
+  formatearPrecio(500) === '$500' && formatearPrecio(1500) === '$1.500' &&
+  formatearPrecio(12500) === '$12.500' && formatearPrecio(1250000) === '$1.250.000')
+inf.check('Sin precio válido el formato es vacío',
+  [null, 0, -1, 1.5, undefined].every((v) => formatearPrecio(v) === ''))
 
 process.exit(inf.resumen() ? 0 : 1)

@@ -123,6 +123,27 @@ export function booleano(valor, porDefecto = true) {
   return typeof valor === 'boolean' ? valor : porDefecto
 }
 
+/** Tope del precio, en pesos. Evita un cero de más que lo vuelva absurdo. */
+export const PRECIO_MAXIMO = 999_999_999
+
+/**
+ * Precio en pesos colombianos: un entero mayor que 0, o null si no hay precio.
+ *
+ * Un texto solo se acepta si son puras cifras. «12.000» no se interpreta: como
+ * número daría 12, y un precio equivocado en silencio es peor que un error.
+ */
+export function precio(valor, { campo = '' } = {}) {
+  if (valor === null || valor === undefined || valor === '') return null
+  const n = typeof valor === 'number' ? valor : /^\d{1,9}$/.test(valor) ? Number(valor) : NaN
+  if (!Number.isInteger(n) || n <= 0 || n > PRECIO_MAXIMO) {
+    throw new ErrorValidacion(
+      'El precio debe ser un número entero mayor que 0, en pesos y sin puntos ni comas.',
+      campo
+    )
+  }
+  return n
+}
+
 function lista(valor, campo) {
   if (!Array.isArray(valor)) throw new ErrorValidacion('Se esperaba una lista.', campo)
   if (valor.length > LIMITES.lista) {
@@ -310,6 +331,7 @@ export function validarSite(entrada) {
       sinFoto: texto(entrada.catalogoSeccion?.sinFoto, { max: 40 }),
       sinDescripcion: texto(entrada.catalogoSeccion?.sinDescripcion, { max: LIMITES.textoMedio }),
       modalNota: texto(entrada.catalogoSeccion?.modalNota, { max: LIMITES.textoMedio }),
+      precioNota: texto(entrada.catalogoSeccion?.precioNota, { max: LIMITES.textoMedio }),
       modalCta: texto(entrada.catalogoSeccion?.modalCta, { max: 40 }),
       cierre: {
         visible: booleano(entrada.catalogoSeccion?.cierre?.visible),
@@ -449,6 +471,9 @@ export function validarProductos(entrada, idsCategorias = null) {
         ? lista(p.galeria, `producto ${k + 1}`).map((x) => slug(x, { campo: `producto ${k + 1}` }))
         : null,
       descripcion: p.descripcion ? texto(p.descripcion, { max: LIMITES.textoMedio }) : null,
+      precio: precio(p.precio, { campo: `producto ${k + 1}` }),
+      // La unidad («por metro») solo tiene sentido junto a un precio.
+      precioUnidad: p.precio && p.precioUnidad ? texto(p.precioUnidad, { max: 30 }) || null : null,
       destacado: booleano(p.destacado, false),
       visible: booleano(p.visible),
       orden: Number.isInteger(p.orden) ? p.orden : k,

@@ -70,6 +70,15 @@ export default function ProductCard({ product, onOpen }) {
           </p>
         )}
 
+        {product.priceLabel && (
+          <p className="mt-3 flex flex-wrap items-baseline gap-x-1.5 text-ink">
+            <span className="font-display text-lg font-extrabold">{product.priceLabel}</span>
+            {product.priceUnit && (
+              <span className="text-xs font-medium text-muted">{product.priceUnit}</span>
+            )}
+          </p>
+        )}
+
         <button
           type="button"
           onClick={() => onOpen(product)}

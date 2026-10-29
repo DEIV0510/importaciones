@@ -35,7 +35,11 @@ export default function Previsualizacion({ onCerrar }) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900" role="dialog" aria-modal="true" aria-label="Previsualización del sitio">
-      <header className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-700 px-4 py-2.5">
+      {/* z-[100]: el sitio que se muestra debajo tiene su propia barra fija
+          (z-50) y su ventana de producto (z-[70]) en este mismo contexto. Sin
+          esto la barra del sitio tapaba el botón «Cerrar» y solo quedaba
+          Escape para salir. */}
+      <header className="relative z-[100] flex shrink-0 items-center justify-between gap-3 border-b border-slate-700 bg-slate-900 px-4 py-2.5">
         <p className="text-sm font-semibold text-white">
           Previsualización
           <span className="ml-2 font-normal text-slate-400">así quedará al publicar</span>

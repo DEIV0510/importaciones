@@ -31,7 +31,9 @@ export function Fila({ children, columnas = 2 }) {
 
 export function Campo({ etiqueta, ayuda, error, children, id }) {
   return (
-    <div className="grid gap-1.5">
+    // content-start: si el campo de al lado es más alto (p. ej. lleva contador),
+    // la cuadrícula estiraría las filas de este y bajaría su casilla.
+    <div className="grid content-start gap-1.5">
       <label htmlFor={id} className="text-sm font-medium text-slate-700">
         {etiqueta}
       </label>
@@ -60,8 +62,11 @@ const claseInput =
 /**
  * @param {string} ruta  Ruta dentro del contenido, p. ej. 'site.hero.titulo'.
  * @param {(v:string)=>string} [validar]  Devuelve mensaje de error o ''.
+ * @param {boolean} [vacioANulo]  Al vaciar el campo guarda null en lugar de ''.
+ *   Para los campos que se publican como null cuando no hay valor: con '' el
+ *   panel creería que hay cambios sin publicar aunque el sitio quede igual.
  */
-export function Texto({ ruta, etiqueta, ayuda, max, validar, placeholder, tipo = 'text' }) {
+export function Texto({ ruta, etiqueta, ayuda, max, validar, placeholder, tipo = 'text', vacioANulo = false }) {
   const { get, set } = useEditor()
   const id = useId()
   const [error, setError] = useState('')
@@ -78,7 +83,10 @@ export function Texto({ ruta, etiqueta, ayuda, max, validar, placeholder, tipo =
         value={valor}
         placeholder={placeholder}
         maxLength={max}
-        onChange={(e) => { set(ruta, e.target.value); if (error) comprobar(e.target.value) }}
+        onChange={(e) => {
+          set(ruta, vacioANulo && e.target.value === '' ? null : e.target.value)
+          if (error) comprobar(e.target.value)
+        }}
         onBlur={(e) => comprobar(e.target.value)}
       />
       {max && (

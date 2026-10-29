@@ -216,7 +216,8 @@
     "vacio": "Aún no hay productos publicados en esta línea. Escríbenos y te contamos qué tenemos disponible.",
     "sinFoto": "Foto próximamente",
     "sinDescripcion": "Consulta disponibilidad con nuestro equipo.",
-    "modalNota": "No publicamos precios en línea. Escríbenos por WhatsApp y te confirmamos disponibilidad y condiciones.",
+    "modalNota": "Escríbenos por WhatsApp y te confirmamos precio, disponibilidad y condiciones.",
+    "precioNota": "Confirma disponibilidad y condiciones por WhatsApp.",
     "modalCta": "Consultar por WhatsApp",
     "cierre": {
       "visible": true,
