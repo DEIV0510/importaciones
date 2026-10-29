@@ -4,7 +4,7 @@
     "nombre": "Insumos para confección",
     "corto": "Confección",
     "descripcion": "Insumos de uso diario para talleres y fábricas de confección.",
-    "imagen": "cinta-faya-clasica",
+    "imagen": null,
     "visible": true,
     "orden": 0
   },
