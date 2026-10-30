@@ -138,8 +138,38 @@ sin publicar.
 
 - *Previsualizar* monta el sitio real con tus cambios, no una imitación.
 - *Descartar cambios* vuelve a lo publicado.
-- Si otra persona publica mientras editas, el panel lo detecta y avisa en lugar
-  de pisar su trabajo.
+- Si el contenido cambia mientras editas (otra persona publicó), el panel no
+  publica a ciegas: **conserva tu borrador**, avisa, y solo si vuelves a pulsar
+  *Publicar* tu versión reemplaza lo que se publicó entretanto.
+- Si cierras el panel con cambios sin publicar y el sitio se actualizó mientras
+  tanto, al volver se recupera tu borrador igualmente, con un aviso. La
+  biblioteca de imágenes nunca viene del borrador: se sube y se borra al
+  instante, así que siempre es la del servidor.
+
+**La «versión» del contenido** es el último commit que modificó `src/content/`
+(no el último de la rama). Subir una foto es un commit y cambia esa versión; el
+panel la anota al terminar la subida. Antes se comparaba la rama entera, y por
+eso cualquier foto subida —o cualquier cambio de código— hacía que el siguiente
+*Publicar* se rechazara como «el contenido cambió».
+
+### Líneas de un producto
+
+En la ficha de cada producto, **Líneas a las que pertenece** muestra todas las
+líneas como botones: se pulsan las que correspondan (puede ser más de una). Ahí
+mismo:
+
+- **Nueva línea** crea una línea con ese nombre y deja el producto dentro de
+  ella. No crea duplicados: si ya existe una con ese nombre, lo dice.
+- El enlace *Cambiar el nombre, la imagen o el orden de las líneas* lleva a la
+  pestaña *Líneas*.
+
+Al **eliminar una línea** en la pestaña *Líneas*, el panel pregunta cuántos
+productos están en ella y, al confirmar, los saca de esa línea (no se borran).
+Si algún producto se queda sin línea, o apunta a una que ya no existe (por
+ejemplo, un borrador antiguo), un aviso sobre la lista de productos lo dice con
+sus nombres, y la línea fantasma aparece en su ficha como un botón
+«… · ya no existe ✕» para quitarla. Con una línea inexistente el servidor se
+niega a publicar.
 
 ### Precios
 
@@ -232,8 +262,9 @@ publicar. Esa prueba lo detecta en un segundo.
   se aplican al cargar la página. Las etiquetas que viajan en el HTML de partida
   se actualizan en el despliegue que dispara cada publicación, no antes.
 - **Borradores compartidos.** El borrador vive en tu navegador. Dos personas
-  editando a la vez no se ven entre sí, aunque el panel sí impide que una pise
-  la publicación de la otra.
+  editando a la vez no se ven entre sí; el panel avisa cuando una publicó antes
+  que la otra, pero no mezcla los cambios: quien publique después decide si
+  reemplaza lo anterior.
 - **Un solo usuario.** Hay una contraseña, no una tabla de administradores.
   Para varias personas con permisos distintos haría falta una base de datos.
 - **Cambiar la estructura.** Se editan los textos, las imágenes y el orden de

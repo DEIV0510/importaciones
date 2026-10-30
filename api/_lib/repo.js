@@ -93,9 +93,10 @@ export async function borrar(rutas, mensaje, autor) {
 
 export async function sha() {
   if (enGitHub()) return git.shaActual()
+  // Igual que en GitHub: la versión es el último commit que tocó el contenido.
   try {
-    const { stdout } = await ejecutar('git', ['rev-parse', 'HEAD'], { cwd: RAIZ })
-    return stdout.trim()
+    const { stdout } = await ejecutar('git', ['log', '-1', '--format=%H', '--', 'src/content'], { cwd: RAIZ })
+    return stdout.trim() || 'local'
   } catch {
     return 'local'
   }

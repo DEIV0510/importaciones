@@ -99,7 +99,7 @@ export function SubirImagen({ onSubida, altInicial = '' }) {
     setSubiendo(true)
     try {
       const res = await api.subirImagen(pendiente.id, pendiente.alt, pendiente.variantes)
-      sincronizarMedios(res.medios)
+      sincronizarMedios(res.medios, res.sha)
       avisar(
         res.reemplazo
           ? `«${pendiente.id}» reemplazada.`
@@ -368,7 +368,7 @@ export default function Medios() {
     setABorrar(null)
     try {
       const res = await api.borrarImagen(id)
-      sincronizarMedios(res.medios)
+      sincronizarMedios(res.medios, res.sha)
       avisar(`«${id}» eliminada.`)
     } catch (err) {
       avisar(err.message, 'error')

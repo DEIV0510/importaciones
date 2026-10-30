@@ -285,7 +285,10 @@ export function Confirmar({ abierto, titulo, mensaje, textoConfirmar = 'Confirma
  * móvil y con lectores de pantalla, que es más de lo que suele dar un
  * reordenamiento por arrastre.
  */
-export function Lista({ ruta, items, render, alAnadir, textoAnadir, minimo = 0, clave = 'id' }) {
+export function Lista({
+  ruta, items, render, alAnadir, textoAnadir, minimo = 0, clave = 'id',
+  tituloEliminar, mensajeEliminar, alEliminar,
+}) {
   const { set } = useEditor()
   const [aBorrar, setABorrar] = useState(null)
 
@@ -297,8 +300,11 @@ export function Lista({ ruta, items, render, alAnadir, textoAnadir, minimo = 0, 
   }
 
   const eliminar = (i) => {
+    const item = items[i]
     set(ruta, items.filter((_, k) => k !== i))
     setABorrar(null)
+    // Quien usa la lista puede limpiar lo que dependía del elemento borrado
+    alEliminar?.(item)
   }
 
   return (
@@ -339,8 +345,12 @@ export function Lista({ ruta, items, render, alAnadir, textoAnadir, minimo = 0, 
 
       <Confirmar
         abierto={aBorrar !== null}
-        titulo="¿Eliminar este elemento?"
-        mensaje="Desaparecerá del panel. El sitio público no cambia hasta que publiques."
+        titulo={aBorrar !== null && tituloEliminar ? tituloEliminar(items[aBorrar]) : '¿Eliminar este elemento?'}
+        mensaje={
+          aBorrar !== null && mensajeEliminar
+            ? mensajeEliminar(items[aBorrar])
+            : 'Desaparecerá del panel. El sitio público no cambia hasta que publiques.'
+        }
         textoConfirmar="Eliminar"
         peligro
         onConfirmar={() => eliminar(aBorrar)}

@@ -18,6 +18,7 @@ const CONTRASENA = process.env.QA_PASSWORD || 'panel-local-12345'
 const RUTA_SITE = 'src/content/site.json'
 const RUTA_PRODUCTOS = 'src/content/products.json'
 const RUTA_MEDIOS = 'src/content/media.json'
+const RUTA_CATEGORIAS = 'src/content/categories.json'
 const PREFIJO_FOTOS_QA = 'qa-foto-'
 
 const inf = crearInforme('PANEL DE ADMINISTRACIÓN')
@@ -26,6 +27,7 @@ const inf = crearInforme('PANEL DE ADMINISTRACIÓN')
 const respaldo = readFileSync(RUTA_SITE, 'utf8')
 const respaldoProductos = readFileSync(RUTA_PRODUCTOS, 'utf8')
 const respaldoMedios = readFileSync(RUTA_MEDIOS, 'utf8')
+const respaldoCategorias = readFileSync(RUTA_CATEGORIAS, 'utf8')
 
 /** PNG liso de un solo color, sin dependencias: lo justo para probar subidas. */
 function crearPng(ancho, alto, [r, g, b]) {
@@ -483,6 +485,298 @@ try {
     await ctxP.close()
   }
 
+  // ------------------------- líneas: borrar una y productos que apuntan a ella ---
+  // Solo trabaja con borradores del navegador: no publica, no toca archivos.
+  {
+    const ctxL = await navegador.newContext({ viewport: { width: 1280, height: 900 }, locale: 'es-CO' })
+    await ctxL.addInitScript(() => {
+      try { localStorage.setItem('mi_panel_guia_vista_v1', '1') } catch { /* sin almacenamiento */ }
+    })
+    const pL = await ctxL.newPage()
+    pL.on('pageerror', (e) => erroresConsola.push(`[líneas] ${e.message}`))
+    pL.on('console', (m) => {
+      if (m.type() !== 'error') return
+      if (/status of (401|403|409|422)/.test(m.text())) return
+      erroresConsola.push(`[líneas] ${m.text()}`)
+    })
+
+    const entrarL = async () => {
+      await pL.goto(BASE + '/admin', { waitUntil: 'networkidle' })
+      if (await pL.locator('#usuario').count()) {
+        await pL.fill('#usuario', 'admin')
+        await pL.fill('#contrasena', CONTRASENA)
+        await pL.click('button[type="submit"]')
+      }
+      await pL.waitForSelector('button[aria-label="Cómo funciona el panel"]')
+    }
+    await entrarL()
+
+    const base = (await pedirEn(pL, '/api/content')).datos
+    const conOtros = base.products.filter((p) => p.categorias.includes('otros'))
+    const millare = base.products.find((p) => p.id === 'millare')
+
+    // --- 1. Borrar la línea desde «Líneas»: sus productos se quedan sin ella, no huérfanos
+    await pL.getByRole('tab', { name: 'Líneas' }).click()
+    const tarjetaOtros = pL.locator('main div.bg-slate-50\\/60', { has: pL.locator('code', { hasText: /^otros$/ }) })
+    await tarjetaOtros.getByRole('button', { name: /^Eliminar el elemento/ }).click()
+    const confirmar = pL.locator('[aria-labelledby="confirmar-titulo"]')
+    const nombreOtros = base.categories.find((c) => c.id === 'otros').nombre
+    inf.check('Borrar una línea pregunta por su nombre',
+      await confirmar.getByRole('heading', { name: `¿Eliminar la línea «${nombreOtros}»?` }).isVisible(), nombreOtros)
+    inf.check('Avisa cuántos productos están en esa línea',
+      (await confirmar.textContent()).includes(`${conOtros.length} productos están en esta línea`),
+      (await confirmar.textContent()).slice(0, 80))
+    await confirmar.getByRole('button', { name: 'Eliminar', exact: true }).click()
+
+    await pL.getByRole('tab', { name: 'Productos' }).click()
+    const filasTrasBorrar = await pL.locator('main ul li').allInnerTexts()
+    const filaMillare = filasTrasBorrar.find((t) => t.includes('Millaré')) ?? ''
+    inf.check('El producto queda en su otra línea y sin la borrada',
+      filaMillare.includes('Cintas') && !filaMillare.includes('Otros'), filaMillare.replace(/\n/g, ' '))
+    inf.check('No quedan productos apuntando a una línea inexistente',
+      !filasTrasBorrar.some((t) => /línea(s)? eliminada/.test(t)) && (await pL.locator('[data-aviso-lineas]').count()) === 0)
+
+    // Se descarta para empezar el siguiente caso desde lo publicado
+    await pL.getByRole('button', { name: 'Descartar', exact: true }).first().click()
+    await pL.locator('[aria-labelledby="confirmar-titulo"]').getByRole('button', { name: 'Descartar' }).click()
+    await pL.locator('[aria-labelledby="confirmar-titulo"]').waitFor({ state: 'detached' })
+
+    // --- 2. El estado del video: borrador con la línea borrada y productos que aún apuntan a ella
+    const fresco2 = (await pedirEn(pL, '/api/content')).datos
+    const borradorHuerfano = {
+      site: fresco2.site,
+      categories: fresco2.categories.filter((c) => c.id !== 'otros'),
+      products: fresco2.products,
+      media: fresco2.media,
+    }
+    await pL.evaluate(([clave, valor]) => localStorage.setItem(clave, valor), [
+      'mi_panel_borrador_v1', JSON.stringify({ sha: fresco2.sha, contenido: borradorHuerfano }),
+    ])
+    await entrarL()
+
+    const aviso = pL.locator('[data-aviso-lineas]')
+    inf.check('Un borrador con líneas borradas se recupera avisando',
+      // .first(): en desarrollo, StrictMode carga dos veces y el aviso sale duplicado
+      await pL.getByText('Recuperamos los cambios que no habías publicado').first().isVisible())
+    inf.check('Avisa cuántos productos necesitan una línea',
+      (await aviso.textContent()).includes(`${conOtros.length} productos necesitan que les elijas una línea`),
+      (await aviso.textContent()).slice(0, 90))
+    inf.check('Avisa que mientras tanto no se puede publicar', (await aviso.textContent()).includes('no podrá publicar'))
+    const filasHuerfanas = await pL.locator('main ul li').allInnerTexts()
+    inf.check('El producto ya no muestra «otros» a secas: dice que la línea fue eliminada',
+      (filasHuerfanas.find((t) => t.includes('Millaré')) ?? '').includes('una línea eliminada'))
+
+    // Se abre el producto de las capturas
+    await pL.getByPlaceholder('Buscar…').fill('Millaré')
+    await pL.locator('main li').first().getByRole('button', { name: 'Editar' }).click()
+    const fichaL = pL.locator('main li').first()
+    const lineasProd = fichaL.locator('[data-lineas-producto]')
+    inf.check('La línea borrada aparece como chip a quitar',
+      (await lineasProd.locator('[data-linea-eliminada]').innerText()).includes('otros · ya no existe'))
+    inf.check('Siguen las líneas que existen para elegir',
+      (await lineasProd.locator('button[aria-pressed]').count()) === fresco2.categories.length - 1)
+
+    // --- el celular, con el chip fantasma y el formulario de línea nueva abiertos
+    await pL.setViewportSize({ width: 390, height: 850 })
+    await fichaL.getByRole('button', { name: 'Nueva línea' }).click()
+    await pL.waitForTimeout(300)
+    const medirL = await pL.evaluate(() => {
+      const vw = document.documentElement.clientWidth
+      const fuera = [...document.querySelectorAll('main button, main input')]
+        .filter((el) => { const b = el.getBoundingClientRect(); return b.width > 0 && (b.right > vw + 1 || b.left < -1) })
+        .map((el) => (el.textContent || el.getAttribute('aria-label') || el.tagName).trim().slice(0, 30))
+      return { fuera, desborda: document.documentElement.scrollWidth > vw + 1 }
+    })
+    inf.check('Las líneas del producto caben en 390px', !medirL.desborda && medirL.fuera.length === 0, medirL.fuera.join(' · '))
+    await pL.setViewportSize({ width: 1280, height: 900 })
+    await fichaL.getByRole('button', { name: 'Cancelar' }).click()
+
+    // --- quitar la línea fantasma
+    await lineasProd.locator('[data-linea-eliminada]').click()
+    inf.check('Quitar la línea fantasma la saca del producto',
+      (await lineasProd.locator('[data-linea-eliminada]').count()) === 0)
+    inf.check('El aviso baja en uno',
+      (await aviso.textContent()).includes(`${conOtros.length - 1} productos necesitan`))
+    inf.check('Ya no queda marcado como producto con problema',
+      !(await fichaL.innerText()).includes('línea eliminada'))
+
+    // --- elegir otra línea
+    const chipElasticos = lineasProd.getByRole('button', { name: 'Elásticos', exact: true })
+    await chipElasticos.click()
+    inf.check('Se puede cambiar la línea del producto', (await chipElasticos.getAttribute('aria-pressed')) === 'true')
+    await chipElasticos.click()
+    inf.check('Y volver a quitarla', (await chipElasticos.getAttribute('aria-pressed')) === 'false')
+    await lineasProd.getByRole('button', { name: 'Cintas', exact: true }).click()
+    inf.check('No deja a un producto sin ninguna línea existente',
+      (await lineasProd.getByRole('button', { name: 'Cintas', exact: true }).getAttribute('aria-pressed')) === 'true' &&
+      await pL.getByText('Un producto debe pertenecer al menos a una línea').isVisible())
+
+    // --- crear una línea desde el producto
+    await fichaL.getByRole('button', { name: 'Nueva línea' }).click()
+    await fichaL.getByLabel('Nombre de la nueva línea').fill('Cintas')
+    await fichaL.getByRole('button', { name: 'Crear y añadir' }).click()
+    inf.check('No crea una línea con el nombre de otra que ya existe',
+      await pL.getByText('Ya existe la línea').isVisible() &&
+      (await lineasProd.getByRole('button', { name: 'Cintas', exact: true }).count()) === 1)
+    await fichaL.getByLabel('Nombre de la nueva línea').fill('Hilos de prueba')
+    await fichaL.getByLabel('Nombre de la nueva línea').press('Enter')
+    const chipNuevo = lineasProd.getByRole('button', { name: 'Hilos de prueba', exact: true })
+    inf.check('Crea la línea y deja el producto dentro de ella',
+      (await chipNuevo.count()) === 1 && (await chipNuevo.getAttribute('aria-pressed')) === 'true')
+    inf.check('El formulario se cierra al crearla', (await fichaL.getByLabel('Nombre de la nueva línea').count()) === 0)
+
+    // --- el enlace lleva a donde se editan las líneas
+    await fichaL.getByRole('button', { name: 'Cambiar el nombre, la imagen o el orden de las líneas' }).click()
+    inf.check('El enlace lleva a la pestaña de líneas, con la nueva incluida',
+      await pL.getByRole('heading', { name: `Líneas del catálogo (${fresco2.categories.length})` }).isVisible())
+
+    // --- el servidor sigue negándose a publicar con una línea fantasma
+    const rechazo = await pedirEn(pL, '/api/content', {
+      metodo: 'PUT', cuerpo: { ...borradorHuerfano, sha: fresco2.sha },
+    })
+    inf.check('El servidor rechaza publicar con una línea que no existe',
+      rechazo.estado === 422 && /otros/.test(rechazo.datos?.error ?? ''), `HTTP ${rechazo.estado} — ${(rechazo.datos?.error ?? '').slice(0, 70)}`)
+
+    inf.check('El producto de la prueba estaba en dos líneas', Boolean(millare) && millare.categorias.length === 2)
+    await ctxL.close()
+  }
+
+  // ----------------- versión del contenido: fotos, conflictos y borradores viejos ---
+  // En modo local no hay commits, así que el servidor no puede reproducir lo que
+  // pasa en producción (cada foto subida es un commit). Se simulan sus respuestas
+  // en el navegador: no se toca el disco ni el repositorio.
+  {
+    const ctxV = await navegador.newContext({ viewport: { width: 1280, height: 900 }, locale: 'es-CO' })
+    await ctxV.addInitScript(() => {
+      try { localStorage.setItem('mi_panel_guia_vista_v1', '1') } catch { /* sin almacenamiento */ }
+    })
+    const pV = await ctxV.newPage()
+    pV.on('pageerror', (e) => erroresConsola.push(`[versión] ${e.message}`))
+    pV.on('console', (m) => {
+      if (m.type() !== 'error') return
+      if (/status of (401|403|409|422)/.test(m.text())) return
+      erroresConsola.push(`[versión] ${m.text()}`)
+    })
+
+    // Lo que hay en disco antes de empezar: bloques anteriores sí publican
+    const discoAntes = [RUTA_PRODUCTOS, RUTA_MEDIOS, RUTA_SITE].map((r) => readFileSync(r, 'utf8'))
+
+    let shaServidor = 'sha-inicial-abc'
+    let responder409 = false
+    const publicaciones = [] // cuerpos recibidos por PUT /api/content
+    let mediosServidor = null
+
+    await ctxV.route('**/api/content', async (route) => {
+      const peticion = route.request()
+      if (peticion.method() === 'GET') {
+        const real = await route.fetch()
+        const datos = await real.json()
+        datos.sha = shaServidor
+        mediosServidor = datos.media
+        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(datos) })
+      }
+      if (peticion.method() === 'PUT') {
+        publicaciones.push(peticion.postDataJSON())
+        if (responder409) {
+          responder409 = false
+          shaServidor = 'sha-nuevo-xyz' // alguien publicó entretanto
+          return route.fulfill({
+            status: 409, contentType: 'application/json',
+            body: JSON.stringify({ error: 'El contenido cambió desde que abriste el panel.' }),
+          })
+        }
+        return route.fulfill({
+          status: 200, contentType: 'application/json',
+          body: JSON.stringify({ ok: true, sha: `sha-publicado-${publicaciones.length}`, local: false }),
+        })
+      }
+      return route.continue()
+    })
+    await ctxV.route('**/api/media', async (route) => {
+      if (route.request().method() !== 'POST') return route.continue()
+      const nuevo = { id: `${PREFIJO_FOTOS_QA}version`, alt: '', variantes: ['sm', 'lg', 'fallback', 'hero'], bytes: 1234, origen: 'panel' }
+      return route.fulfill({
+        status: 200, contentType: 'application/json',
+        // sha: lo que devuelve GitHub tras el commit de la foto
+        body: JSON.stringify({ ok: true, reemplazo: false, medio: nuevo, medios: [...(mediosServidor ?? []), nuevo], sha: 'sha-tras-subir-123', local: false }),
+      })
+    })
+
+    await pV.goto(BASE + '/admin', { waitUntil: 'networkidle' })
+    await pV.fill('#usuario', 'admin')
+    await pV.fill('#contrasena', CONTRASENA)
+    await pV.click('button[type="submit"]')
+    await pV.waitForSelector('button[aria-label="Cómo funciona el panel"]')
+
+    // --- 1. Subir una foto y publicar: el panel debe enviar la versión posterior a la foto
+    await pV.getByRole('button', { name: 'Editar' }).first().click()
+    const fichaV = pV.locator('main li').first()
+    await fichaV.getByRole('button', { name: 'Subir nueva' }).click()
+    const bibV = pV.locator('[role="dialog"][aria-label="Elegir imagen"]')
+    await bibV.locator('input[data-subir-imagen]').setInputFiles({
+      name: `${PREFIJO_FOTOS_QA}version.png`, mimeType: 'image/png', buffer: crearPng(80, 80, [20, 140, 90]),
+    })
+    await bibV.getByRole('button', { name: 'Subir y usar' }).click()
+    await bibV.waitFor({ state: 'detached', timeout: 20000 })
+
+    const publicarDesdeElPanel = async () => {
+      const dlg = pV.locator('[aria-labelledby="publicar-titulo"]')
+      // Tras un conflicto la ventana de publicar sigue abierta: basta volver a pulsar
+      if (!(await dlg.count())) await pV.getByRole('button', { name: 'Publicar', exact: true }).click()
+      await dlg.getByRole('button', { name: 'Publicar' }).click()
+      await pV.waitForTimeout(600)
+    }
+    await publicarDesdeElPanel()
+    inf.check('Tras subir una foto, publicar envía la versión que dejó la foto',
+      publicaciones[0]?.sha === 'sha-tras-subir-123', String(publicaciones[0]?.sha))
+    inf.check('Publicar con éxito deja el panel sin cambios pendientes',
+      (await pV.getByText('Tienes cambios sin publicar').count()) === 0)
+
+    // --- 2. Conflicto al publicar: el borrador se conserva y el siguiente intento pasa
+    await pV.getByLabel('Precio (pesos)').fill('4500')
+    responder409 = true
+    await publicarDesdeElPanel()
+    inf.check('Un conflicto no tira el borrador: siguen los cambios sin publicar',
+      await pV.getByText('Tienes cambios sin publicar').isVisible() &&
+      (await pV.getByLabel('Precio (pesos)').inputValue()) === '4500')
+    inf.check('Un conflicto explica qué pasó y que el trabajo sigue ahí',
+      await pV.getByText('Tus cambios siguen aquí').first().isVisible())
+    await publicarDesdeElPanel()
+    inf.check('Tras el conflicto, publicar de nuevo usa la versión actual del servidor',
+      publicaciones.at(-1)?.sha === 'sha-nuevo-xyz', String(publicaciones.at(-1)?.sha))
+    inf.check('Y ese segundo intento sí queda publicado',
+      (await pV.getByText('Tienes cambios sin publicar').count()) === 0 &&
+      (await pV.getByText('Publicado. El sitio se está reconstruyendo').first().isVisible()))
+
+    // --- 3. Un borrador guardado con otra versión se recupera (antes se perdía en silencio)
+    const actual = (await pedirEn(pV, '/api/content')).datos
+    const productosViejos = JSON.parse(JSON.stringify(actual.products))
+    productosViejos[1].precio = 7777
+    await pV.evaluate(([k, v]) => localStorage.setItem(k, v), [
+      'mi_panel_borrador_v1',
+      JSON.stringify({
+        sha: 'sha-de-hace-un-rato',
+        // media vieja a propósito: la biblioteca vigente es la del servidor
+        contenido: { site: actual.site, categories: actual.categories, products: productosViejos, media: [] },
+      }),
+    ])
+    await pV.goto(BASE + '/admin', { waitUntil: 'networkidle' })
+    await pV.waitForSelector('button[aria-label="Cómo funciona el panel"]')
+    inf.check('Un borrador con otra versión se recupera, no se descarta',
+      await pV.getByText('Tienes cambios sin publicar').isVisible())
+    inf.check('Avisa que el sitio cambió desde que lo empezaste',
+      await pV.getByText('el sitio se actualizó desde que los empezaste').first().isVisible())
+    inf.check('El borrador recuperado conserva lo editado',
+      (await pV.locator('main ul li').nth(1).innerText()).includes('$7.777'))
+    await pV.getByRole('button', { name: 'Imágenes', exact: true }).click()
+    inf.check('Pero la biblioteca de imágenes es siempre la del servidor, no la del borrador',
+      await pV.getByRole('heading', { name: `Biblioteca (${actual.media.length})` }).isVisible(), `${actual.media.length} imágenes`)
+
+    inf.check('Esta parte no escribió nada en el disco',
+      [RUTA_PRODUCTOS, RUTA_MEDIOS, RUTA_SITE].every((r, i) => readFileSync(r, 'utf8') === discoAntes[i]))
+    await ctxV.close()
+  }
+
   // ------------------------------------------------------- responsive ----
   await page.goto(BASE + '/admin', { waitUntil: 'networkidle' })
   await page.fill('#usuario', 'admin')
@@ -518,6 +812,7 @@ try {
   writeFileSync(RUTA_SITE, respaldo)
   writeFileSync(RUTA_PRODUCTOS, respaldoProductos)
   writeFileSync(RUTA_MEDIOS, respaldoMedios)
+  writeFileSync(RUTA_CATEGORIAS, respaldoCategorias)
   for (const f of readdirSync('public/img')) {
     if (f.startsWith(PREFIJO_FOTOS_QA)) unlinkSync(`public/img/${f}`)
   }

@@ -42,6 +42,28 @@ function Categorias() {
         minimo={1}
         alAnadir={anadir}
         textoAnadir="Añadir línea"
+        tituloEliminar={(cat) => `¿Eliminar la línea «${cat.nombre}»?`}
+        mensajeEliminar={(cat) => {
+          const n = productos.filter((p) => p.categorias?.includes(cat.id)).length
+          if (!n) return 'Desaparecerá del panel. El sitio público no cambia hasta que publiques.'
+          return (
+            `${n} producto${n === 1 ? '' : 's'} ${n === 1 ? 'está' : 'están'} en esta línea. ` +
+            `No se ${n === 1 ? 'borra' : 'borran'}: solo dejan de pertenecer a ella, y luego ` +
+            'podrás elegirles otra desde su ficha en Productos.'
+          )
+        }}
+        // Sin esto, los productos seguían apuntando a una línea que ya no
+        // existía: no se veían en su ficha y el servidor rechazaba publicar.
+        alEliminar={(cat) =>
+          set(
+            'products',
+            productos.map((p) =>
+              p.categorias?.includes(cat.id)
+                ? { ...p, categorias: p.categorias.filter((x) => x !== cat.id) }
+                : p
+            )
+          )
+        }
         render={(cat, i) => {
           const usada = productos.filter((p) => p.categorias?.includes(cat.id)).length
           return (
@@ -118,11 +140,60 @@ function CampoPrecio({ indice }) {
   )
 }
 
-function Productos() {
+/** Crear una línea sin salir de la ficha del producto. */
+function NuevaLinea({ onCrear }) {
+  const [abierta, setAbierta] = useState(false)
+  const [nombre, setNombre] = useState('')
+
+  if (!abierta) {
+    return (
+      <button type="button" onClick={() => setAbierta(true)}
+        className="inline-flex items-center gap-1 rounded-full border border-dashed border-slate-400 bg-white px-3 py-1 text-xs font-semibold text-slate-600 hover:border-sky-600 hover:text-sky-700">
+        <Plus className="size-3" aria-hidden="true" />
+        Nueva línea
+      </button>
+    )
+  }
+
+  const cerrar = () => { setAbierta(false); setNombre('') }
+  const enviar = () => { if (onCrear(nombre)) cerrar() }
+
+  return (
+    <div className="flex w-full flex-wrap items-center gap-2">
+      <input
+        autoFocus
+        aria-label="Nombre de la nueva línea"
+        className={`${claseInput} min-w-0 flex-1 basis-48`}
+        maxLength={80}
+        placeholder="Ej.: Hilos y agujas"
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); enviar() }
+          if (e.key === 'Escape') cerrar()
+        }}
+      />
+      <Boton variante="primario" onClick={enviar} disabled={!nombre.trim()}>Crear y añadir</Boton>
+      <Boton onClick={cerrar}>Cancelar</Boton>
+    </div>
+  )
+}
+
+function Productos({ irALineas }) {
   const { productos, categorias, medios, set, avisar } = useEditor()
   const [busqueda, setBusqueda] = useState('')
   const [abierto, setAbierto] = useState(null)
   const [subiendoGaleria, setSubiendoGaleria] = useState(null) // índice del producto
+
+  // Líneas que existen. Un producto puede seguir apuntando a una que ya no (se
+  // borró, o viene de un borrador antiguo): esas referencias no se ven entre
+  // las opciones y el servidor se niega a publicar con ellas.
+  const idsLineas = useMemo(() => new Set(categorias.map((c) => c.id)), [categorias])
+  const huerfanas = (p) => (p.categorias ?? []).filter((x) => !idsLineas.has(x))
+  const sinLinea = (p) => !(p.categorias ?? []).some((x) => idsLineas.has(x))
+  const aRevisar = productos
+    .map((p, i) => ({ p, i }))
+    .filter(({ p }) => huerfanas(p).length > 0 || sinLinea(p))
 
   const filtrados = useMemo(() => {
     const q = sinAcentos(busqueda.trim())
@@ -169,11 +240,40 @@ function Productos() {
   const alternarCategoria = (i, id) => {
     const actuales = productos[i].categorias ?? []
     const nuevas = actuales.includes(id) ? actuales.filter((x) => x !== id) : [...actuales, id]
-    if (!nuevas.length) {
+    // Cuentan solo las líneas que existen: una huérfana no sostiene al producto
+    if (!nuevas.some((x) => idsLineas.has(x))) {
       avisar('Un producto debe pertenecer al menos a una línea.', 'error')
       return
     }
     set(`products.${i}.categorias`, nuevas)
+  }
+
+  const quitarHuerfana = (i, id) =>
+    set(`products.${i}.categorias`, (productos[i].categorias ?? []).filter((x) => x !== id))
+
+  /** Crea la línea y deja el producto dentro de ella. Devuelve false si no se pudo. */
+  const crearLinea = (i, nombre) => {
+    const limpio = nombre.trim().slice(0, 80)
+    if (!limpio) return false
+    const repetida = categorias.find(
+      (c) => sinAcentos(c.nombre) === sinAcentos(limpio) || sinAcentos(c.corto) === sinAcentos(limpio)
+    )
+    if (repetida) {
+      avisar(`Ya existe la línea «${repetida.nombre}»: elígela en la lista.`, 'error')
+      return false
+    }
+    const base = idDesde(limpio)
+    let id = base
+    for (let n = 2; idsLineas.has(id); n++) id = `${base}-${n}`
+    set('categories', [
+      ...categorias,
+      { id, nombre: limpio, corto: limpio.slice(0, 40), descripcion: '', imagen: null, visible: true, orden: categorias.length },
+    ])
+    // Si el producto apuntaba a una línea borrada con este mismo identificador,
+    // queda enlazado de nuevo: no se duplica.
+    set(`products.${i}.categorias`, [...new Set([...(productos[i].categorias ?? []), id])])
+    avisar(`Línea «${limpio}» creada y añadida a este producto.`)
+    return true
   }
 
   const alternarGaleria = (i, idImagen) => {
@@ -197,6 +297,25 @@ function Productos() {
         </div>
       }
     >
+      {aRevisar.length > 0 && (
+        <div data-aviso-lineas role="status" className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-900">
+            {aRevisar.length === 1
+              ? '1 producto necesita que le elijas una línea'
+              : `${aRevisar.length} productos necesitan que les elijas una línea`}
+          </p>
+          <p className="mt-1 text-sm text-amber-800">
+            {aRevisar.slice(0, 4).map(({ p }) => p.nombre).join(', ')}
+            {aRevisar.length > 4 ? ` y ${aRevisar.length - 4} más` : ''}.
+            Apuntan a una línea que ya no existe o no tienen ninguna. Mientras sigan así, el
+            panel no podrá publicar.
+          </p>
+          <Boton className="mt-3" onClick={() => { setBusqueda(''); setAbierto(aRevisar[0].i) }}>
+            Revisar {aRevisar.length === 1 ? 'el producto' : 'el primero'}
+          </Boton>
+        </div>
+      )}
+
       {!filtrados.length && <Vacio>Ningún producto coincide con «{busqueda}».</Vacio>}
 
       <ul className="grid gap-2">
@@ -214,7 +333,17 @@ function Productos() {
                   {p.destacado && <Star className="size-3.5 shrink-0 fill-amber-400 text-amber-400" aria-label="Destacado" />}
                 </span>
                 <span className="block truncate text-xs text-slate-500">
-                  {(p.categorias ?? []).map((c) => categorias.find((x) => x.id === c)?.corto ?? c).join(' · ') || 'Sin línea'}
+                  {(p.categorias ?? []).filter((c) => idsLineas.has(c))
+                    .map((c) => categorias.find((x) => x.id === c).corto).join(' · ')}
+                  {huerfanas(p).length > 0 && (
+                    <span className="font-semibold text-amber-700">
+                      {sinLinea(p) ? '' : ' · '}
+                      {huerfanas(p).length === 1 ? 'una línea eliminada' : `${huerfanas(p).length} líneas eliminadas`}
+                    </span>
+                  )}
+                  {sinLinea(p) && huerfanas(p).length === 0 && (
+                    <span className="font-semibold text-amber-700">Sin línea</span>
+                  )}
                   {p.precio ? ` · ${formatearPrecio(p.precio)}` : ''}
                 </span>
               </button>
@@ -246,8 +375,9 @@ function Productos() {
                     ayuda="Se muestra al lado del precio. Sin precio, no se muestra." />
                 </Fila>
 
-                <Campo etiqueta="Líneas a las que pertenece">
-                  <div className="flex flex-wrap gap-2">
+                <Campo etiqueta="Líneas a las que pertenece"
+                  ayuda="Pulsa las que correspondan (puede ser más de una). Si falta alguna, créala aquí mismo.">
+                  <div data-lineas-producto className="flex flex-wrap gap-2">
                     {categorias.map((c) => {
                       const activa = (p.categorias ?? []).includes(c.id)
                       return (
@@ -260,7 +390,22 @@ function Productos() {
                         </button>
                       )
                     })}
+                    {huerfanas(p).map((id) => (
+                      <button key={id} type="button" onClick={() => quitarHuerfana(i, id)}
+                        data-linea-eliminada
+                        title="Esta línea ya no existe. Pulsa para quitarla de este producto."
+                        className="rounded-full border border-amber-400 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900 hover:bg-amber-100">
+                        {id} · ya no existe ✕
+                      </button>
+                    ))}
+                    <NuevaLinea onCrear={(nombre) => crearLinea(i, nombre)} />
                   </div>
+                  {irALineas && (
+                    <button type="button" onClick={irALineas}
+                      className="justify-self-start text-xs font-semibold text-sky-700 underline underline-offset-2 hover:text-sky-900">
+                      Cambiar el nombre, la imagen o el orden de las líneas
+                    </button>
+                  )}
                 </Campo>
 
                 <SelectorImagen ruta={`products.${i}.imagen`} etiqueta="Foto principal" permitirVacio
@@ -395,7 +540,7 @@ export default function Catalogo() {
           </button>
         ))}
       </div>
-      <Componente />
+      <Componente irALineas={() => setActiva('lineas')} />
     </div>
   )
 }

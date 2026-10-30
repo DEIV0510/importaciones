@@ -10,8 +10,21 @@
  * La contraseña sale de CREDENCIALES-PANEL.txt o de la variable
  * QA_ADMIN_PASSWORD. Nunca se imprime.
  */
+import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { crearInforme } from './lib.mjs'
+
+/** Último commit de origin/main que tocó el contenido; null si no hay git. */
+function ultimoCommitDeContenido() {
+  try {
+    execFileSync('git', ['fetch', '-q', 'origin', 'main'], { stdio: 'ignore' })
+    return execFileSync('git', ['log', '-1', '--format=%H', 'origin/main', '--', 'src/content'], {
+      encoding: 'utf8',
+    }).trim()
+  } catch {
+    return null
+  }
+}
 
 const BASE = (process.env.QA_PROD_URL || 'https://importaciones-olive.vercel.app').replace(/\/+$/, '')
 
@@ -98,6 +111,16 @@ if (!clave) {
     inf.check('Con sesión lee el contenido', r.estado === 200,
       r.estado === 200 ? `${r.datos?.products?.length ?? 0} productos` : (r.datos?.error ?? `HTTP ${r.estado}`))
     inf.check('El contenido trae el identificador de versión', Boolean(r.datos?.sha))
+    // La versión es el último commit que tocó src/content, NO el de la rama: si
+    // fuera el de la rama, cada foto subida o cambio de código haría que el
+    // siguiente «Publicar» se rechazara como «el contenido cambió».
+    const esperado = ultimoCommitDeContenido()
+    if (esperado) {
+      inf.check('La versión del contenido es la del último commit que lo tocó, no la de la rama',
+        r.datos?.sha === esperado, `${String(r.datos?.sha).slice(0, 7)} vs ${esperado.slice(0, 7)}`)
+    } else {
+      console.log('  ----  Sin git disponible: no se comprueba la versión del contenido.')
+    }
     inf.check('Los productos traen el campo de precio (null si no hay)',
       (r.datos?.products ?? []).length > 0 &&
       r.datos.products.every((p) => 'precio' in p && 'precioUnidad' in p),
