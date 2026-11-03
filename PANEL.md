@@ -146,7 +146,7 @@ sin publicar.
   biblioteca de imágenes nunca viene del borrador: se sube y se borra al
   instante, así que siempre es la del servidor.
 
-**La «versión» del contenido** es el último commit que modificó `src/content/`
+**La «versión» del contenido** es el último commit que modificó los JSON de `src/content/` (`site`, `categories`, `products`, `media`)
 (no el último de la rama). Subir una foto es un commit y cambia esa versión; el
 panel la anota al terminar la subida. Antes se comparaba la rama entera, y por
 eso cualquier foto subida —o cualquier cambio de código— hacía que el siguiente

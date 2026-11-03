@@ -14,11 +14,12 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { crearInforme } from './lib.mjs'
 
-/** Último commit de origin/main que tocó el contenido; null si no hay git. */
+/** Último commit de origin/main que tocó los JSON de contenido; null si no hay git. */
 function ultimoCommitDeContenido() {
   try {
     execFileSync('git', ['fetch', '-q', 'origin', 'main'], { stdio: 'ignore' })
-    return execFileSync('git', ['log', '-1', '--format=%H', 'origin/main', '--', 'src/content'], {
+    const archivos = ['site', 'categories', 'products', 'media'].map((f) => `src/content/${f}.json`)
+    return execFileSync('git', ['log', '-1', '--format=%H', 'origin/main', '--', ...archivos], {
       encoding: 'utf8',
     }).trim()
   } catch {

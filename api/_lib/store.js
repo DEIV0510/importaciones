@@ -161,17 +161,29 @@ export async function borrarArchivos(rutas, mensaje, autor) {
 
 // ----------------------------------------------------------------- historial
 
+/** Los archivos que edita el panel. src/content también tiene código (.js). */
+export const ARCHIVOS_DE_CONTENIDO = ['site', 'categories', 'products', 'media']
+  .map((f) => `src/content/${f}.json`)
+
 /**
- * Último commit que modificó el contenido editable (src/content). Es la
- * «versión» que el panel guarda al abrirse y devuelve al publicar.
+ * Último commit que modificó el contenido editable. Es la «versión» que el
+ * panel guarda al abrirse y devuelve al publicar.
  *
  * Antes era el último commit de la rama entera, y eso era un error: cada foto
  * que se sube es un commit, así que tras subir una imagen el siguiente
- * «Publicar» llegaba con una versión vieja y se rechazaba.
+ * «Publicar» llegaba con una versión vieja y se rechazaba. Se miran solo los
+ * JSON, no la carpeta: ahí también hay código, y un cambio de código no cambia
+ * lo que se edita en el panel.
  */
 async function shaContenido(rama) {
-  const commits = await gh(`/commits?sha=${encodeURIComponent(rama)}&path=src%2Fcontent&per_page=1`)
-  return commits[0]?.sha ?? null
+  const listas = await Promise.all(
+    ARCHIVOS_DE_CONTENIDO.map((ruta) =>
+      gh(`/commits?sha=${encodeURIComponent(rama)}&path=${encodeURIComponent(ruta)}&per_page=1`)
+    )
+  )
+  const ultimos = listas.map((l) => l[0]).filter(Boolean)
+  ultimos.sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date))
+  return ultimos[0]?.sha ?? null
 }
 
 export async function shaActual() {
