@@ -8,6 +8,7 @@
  */
 
 import { formatearPrecio } from './formato'
+import { rutaImagen, versionesDe } from './imagenes'
 
 const WA_BASE = 'https://wa.me/'
 
@@ -18,7 +19,11 @@ function plantilla(texto, valores) {
   )
 }
 
-export function derive(site, categorias, productos) {
+export function derive(site, categorias, productos, medios) {
+  const versiones = versionesDe(medios)
+  /** Dirección de una imagen: imagen('cinta-faya-clasica', 'sm.webp'). */
+  const imagen = (id, archivo) => rutaImagen(id, archivo, versiones[id])
+
   const telefonos = (site.contacto?.telefonos ?? []).filter((t) => t.wa)
 
   const PHONES = telefonos.map((t) => ({
@@ -136,6 +141,7 @@ export function derive(site, categorias, productos) {
 
   return {
     raw: site,
+    imagen,
     COMPANY,
     ADDRESS,
     MAPS,

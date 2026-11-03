@@ -7,6 +7,7 @@
  * bytes mágicos de cada archivo. Que la extensión diga .webp no significa que
  * el contenido lo sea, y una imagen es lo único que debe poder entrar.
  */
+import { createHash } from 'node:crypto'
 import { ErrorHttp, exigirAdmin } from './_lib/auth.js'
 import { json, leerCuerpo, manejar, soloMetodos } from './_lib/http.js'
 import { borrar, escribir, leer } from './_lib/repo.js'
@@ -82,20 +83,26 @@ export default manejar(async (req, res) => {
 
     const archivos = []
     let bytes = 0
+    // Huella del contenido: va en la dirección de la imagen (?v=…). Si se
+    // reemplaza la foto, cambia, y ningún navegador se queda con la vieja.
+    const huella = createHash('sha1')
     for (const v of nombres) {
       const { bruto, bytes: n } = decodificar(entrantes[v], v, id)
       bytes += n
+      huella.update(bruto)
       archivos.push({
         ruta: `public/img/${id}-${v}.${VARIANTES[v].ext}`,
         contenido: bruto,
         binario: true,
       })
     }
+    const version = huella.digest('hex').slice(0, 10)
 
     const previo = medios.find((m) => m.id === id)
+    const entrada = { id, alt, variantes: nombres, bytes, origen: 'panel', version }
     const actualizados = previo
-      ? medios.map((m) => (m.id === id ? { ...m, alt, variantes: nombres, bytes, origen: 'panel' } : m))
-      : [...medios, { id, alt, variantes: nombres, bytes, origen: 'panel' }]
+      ? medios.map((m) => (m.id === id ? { ...m, ...entrada } : m))
+      : [...medios, entrada]
 
     actualizados.sort((a, b) => a.id.localeCompare(b.id))
     archivos.push({

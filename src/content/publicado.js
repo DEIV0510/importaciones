@@ -1,6 +1,7 @@
 import siteJson from './site.json'
 import categoriesJson from './categories.json'
 import productsJson from './products.json'
+import mediaJson from './media.json'
 
 /**
  * Contenido publicado, incrustado en el bundle.
@@ -14,7 +15,15 @@ export const CONTENIDO_PUBLICADO = {
   site: siteJson,
   categories: categoriesJson,
   products: productsJson,
+  // Solo para la versión de cada imagen en su dirección (?v=…)
+  media: mediaJson,
 }
+
+// Solo en desarrollo: publicar o subir una foto reescribe estos JSON, y Vite
+// recargaba entonces todas las pestañas abiertas; el panel perdía lo que tenía
+// abierto. Aceptando el cambio aquí no se recarga nada: las páginas que se
+// abran después ya leen el contenido nuevo.
+if (import.meta.hot) import.meta.hot.accept(() => {})
 
 /** Escribe el tema en :root para que las utilidades de Tailwind lo tomen. */
 export function aplicarTema(tema, destino) {

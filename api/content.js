@@ -49,7 +49,10 @@ export default manejar(async (req, res) => {
     const ids = new Set(categories.map((c) => c.id))
     products = validarProductos(cuerpo.products, ids)
     site = validarSite(cuerpo.site)
-    media = validarMedios(cuerpo.media)
+    // La biblioteca es la del servidor, no la que manda el navegador: las
+    // imágenes se suben y se borran al instante por /api/media, y una copia
+    // vieja en el borrador borraría de la lista las fotos subidas después.
+    media = validarMedios(JSON.parse(await leer(ARCHIVOS.media)))
   } catch (err) {
     if (err instanceof ErrorValidacion) {
       const e = new ErrorHttp(422, err.message)
@@ -87,7 +90,6 @@ export default manejar(async (req, res) => {
       { ruta: ARCHIVOS.site, contenido: JSON.stringify(site, null, 2) + '\n' },
       { ruta: ARCHIVOS.categories, contenido: JSON.stringify(categories, null, 2) + '\n' },
       { ruta: ARCHIVOS.products, contenido: JSON.stringify(products, null, 2) + '\n' },
-      { ruta: ARCHIVOS.media, contenido: JSON.stringify(media, null, 2) + '\n' },
     ],
     mensaje,
     { nombre: sesion.u, email: process.env.GIT_AUTHOR_EMAIL || 'panel@mundoimportaciones.local' },

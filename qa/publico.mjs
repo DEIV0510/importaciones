@@ -44,6 +44,11 @@ for (const vp of ANCHOS) {
     ).length,
     imagenesRotas: [...document.images].filter((i) => i.complete && i.naturalWidth === 0).length,
     imagenes: document.images.length,
+    // Toda imagen de la biblioteca debe ir con versión (?v=…): sin ella, un 404
+    // guardado en caché o una foto reemplazada se quedan pegados en el navegador
+    sinVersion: [...document.querySelectorAll('img, source')]
+      .flatMap((el) => [el.getAttribute('src'), el.getAttribute('srcset')])
+      .filter((u) => u && u.startsWith('/img/') && !/[?&]v=/.test(u)),
   }))
 
   inf.check(
@@ -52,6 +57,7 @@ for (const vp of ANCHOS) {
     `${a.scrollW} vs ${a.vw}`
   )
   inf.check(`${vp.nombre}: sin imágenes rotas`, a.imagenesRotas === 0, `${a.imagenes} imágenes`)
+  inf.check(`${vp.nombre}: las imágenes van con versión`, a.sinVersion.length === 0, a.sinVersion.slice(0, 3).join(' · '))
   inf.check(`${vp.nombre}: reveals visibles`, a.revealOcultos === 0)
   inf.check(`${vp.nombre}: sin errores de consola`, errores.length === 0, errores.join(' | ').slice(0, 120))
 

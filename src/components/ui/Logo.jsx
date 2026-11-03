@@ -12,14 +12,14 @@ import { useContent } from '../../content/ContentContext'
  * no repitan la ruta: al cambiarlo, cambia en los tres sitios a la vez.
  */
 export default function Logo({ className = '', tier = 'sm', ...rest }) {
-  const { COMPANY } = useContent()
+  const { COMPANY, imagen } = useContent()
   const base = COMPANY.logo || 'logo'
 
   return (
     <picture className="contents">
-      <source srcSet={`/img/${base}-${tier}.webp`} type="image/webp" />
+      <source srcSet={imagen(base, `${tier}.webp`)} type="image/webp" />
       <img
-        src={`/img/${base}-fallback.png`}
+        src={imagen(base, 'fallback.png')}
         alt={COMPANY.legalName}
         className={className}
         {...rest}

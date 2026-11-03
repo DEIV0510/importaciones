@@ -216,6 +216,28 @@ del producto.
 No se puede borrar una imagen que alguna sección siga usando; el panel dice
 cuál la está usando.
 
+**Una foto subida tarda cerca de un minuto en existir en el sitio**: es un
+commit y hay que esperar al despliegue de Vercel. Para que eso no se note:
+
+- El panel muestra lo recién subido desde el propio navegador (los mismos
+  archivos que envió), así que se ve al instante en la ficha y en
+  *Previsualizar*.
+- Si una foto aún no está desplegada (por ejemplo, tras recargar), la miniatura
+  dice «Publicándose…» y se vuelve a pedir sola cada 5 segundos.
+- Las direcciones llevan la versión de la imagen (`?v=…`, la huella que anota
+  el servidor al subirla). Antes no la llevaban y había un fallo serio:
+  `/img/` se sirve con caché de 30 días y Vercel la aplica también a los 404,
+  así que si el navegador pedía una foto antes del despliegue, guardaba «no
+  existe» durante 30 días y la foto no cargaba aunque ya estuviera publicada.
+  Con la versión, además, reemplazar una foto se ve enseguida.
+- El panel pide las fotos con un parámetro propio (`p=`), nunca con la
+  dirección pública: un 404 pasajero del panel no puede quedar guardado en la
+  dirección que usan los visitantes.
+
+Publicar textos y restaurar versiones **no tocan la biblioteca**: la lista de
+imágenes es siempre la del servidor. Restaurar una versión que use fotos ya
+borradas se rechaza diciendo cuáles faltan.
+
 ### Historial
 
 Cada publicación queda registrada con fecha y autor. *Restaurar* no borra nada:

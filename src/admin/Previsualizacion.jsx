@@ -14,7 +14,7 @@ import { useEditor } from './estado'
  * que estás probando no repinten el panel.
  */
 export default function Previsualizacion({ onCerrar }) {
-  const { borrador } = useEditor()
+  const { borrador, urlPanel } = useEditor()
   const [ancho, setAncho] = useState('escritorio')
   const contenedor = useRef(null)
 
@@ -74,7 +74,9 @@ export default function Previsualizacion({ onCerrar }) {
             ancho === 'movil' ? 'max-w-[390px] sm:rounded-2xl sm:shadow-2xl' : 'max-w-none'
           }`}
         >
-          <ContentProvider contenido={borrador} aplicarTemaGlobal={false}>
+          {/* Las fotos recién subidas aún no están desplegadas: urlPanel las
+              sirve desde el navegador para que aquí se vean ya. */}
+          <ContentProvider contenido={borrador} aplicarTemaGlobal={false} resolverImagen={urlPanel}>
             <App conCortina={false} />
           </ContentProvider>
         </div>

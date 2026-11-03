@@ -29,6 +29,20 @@ const respaldoProductos = readFileSync(RUTA_PRODUCTOS, 'utf8')
 const respaldoMedios = readFileSync(RUTA_MEDIOS, 'utf8')
 const respaldoCategorias = readFileSync(RUTA_CATEGORIAS, 'utf8')
 
+/**
+ * Las pruebas usan un catálogo fijo (qa/fixtures/contenido), no el publicado:
+ * el dueño edita el contenido real desde el panel en vivo, y unas pruebas que
+ * dependan de cuántos productos o líneas hay hoy fallarían por eso y no por un
+ * fallo del código. Se carga dentro del try y el finally deja el real.
+ */
+function cargarCatalogoDePrueba() {
+  const fijo = (f) => readFileSync(`qa/fixtures/contenido/${f}`, 'utf8')
+  writeFileSync(RUTA_SITE, fijo('site.json'))
+  writeFileSync(RUTA_CATEGORIAS, fijo('categories.json'))
+  writeFileSync(RUTA_PRODUCTOS, fijo('products.json'))
+  writeFileSync(RUTA_MEDIOS, fijo('media.json'))
+}
+
 /** PNG liso de un solo color, sin dependencias: lo justo para probar subidas. */
 function crearPng(ancho, alto, [r, g, b]) {
   const fila = Buffer.concat([Buffer.from([0]), Buffer.from(Array.from({ length: ancho }, () => [r, g, b]).flat())])
@@ -86,6 +100,8 @@ const pedirEn = (pg, ruta, opciones = {}) =>
 const pedir = (ruta, opciones = {}) => pedirEn(page, ruta, opciones)
 
 try {
+  cargarCatalogoDePrueba()
+  await new Promise((r) => setTimeout(r, 1500)) // que el servidor de desarrollo lo recoja
   await page.goto(BASE + '/admin', { waitUntil: 'networkidle' })
 
   // ------------------------------------------------- sin autenticación -----
@@ -775,6 +791,106 @@ try {
     inf.check('Esta parte no escribió nada en el disco',
       [RUTA_PRODUCTOS, RUTA_MEDIOS, RUTA_SITE].every((r, i) => readFileSync(r, 'utf8') === discoAntes[i]))
     await ctxV.close()
+  }
+
+  // ------------------------------- foto recién subida que aún no está desplegada ---
+  // En producción, una foto subida tarda cerca de un minuto en existir (hay que
+  // esperar al despliegue). Mientras tanto Vercel responde 404 CON la caché de
+  // 30 días de /img/. Se reproduce aquí con una ruta del navegador.
+  {
+    const ID = `${PREFIJO_FOTOS_QA}retraso`
+    const ctxI = await navegador.newContext({ viewport: { width: 1280, height: 900 }, locale: 'es-CO' })
+    await ctxI.addInitScript(() => {
+      try { localStorage.setItem('mi_panel_guia_vista_v1', '1') } catch { /* sin almacenamiento */ }
+    })
+    let desplegado = false
+    const pedidas = []
+    await ctxI.route(`**/img/${ID}-*`, (route) => {
+      pedidas.push(route.request().url())
+      if (desplegado) return route.continue()
+      return route.fulfill({
+        status: 404, contentType: 'text/plain',
+        headers: { 'Cache-Control': 'public, max-age=2592000, must-revalidate' },
+        body: 'The page could not be found',
+      })
+    })
+    const pI = await ctxI.newPage()
+    pI.on('pageerror', (e) => erroresConsola.push(`[foto] ${e.message}`))
+    // Los 404 de la foto aún sin desplegar son justo lo que se simula
+    pI.on('console', (m) => {
+      if (m.type() !== 'error') return
+      if (/status of (401|403|404|409|422)/.test(m.text())) return
+      erroresConsola.push(`[foto] ${m.text()}`)
+    })
+
+    await pI.goto(BASE + '/admin', { waitUntil: 'networkidle' })
+    await pI.fill('#usuario', 'admin')
+    await pI.fill('#contrasena', CONTRASENA)
+    await pI.click('button[type="submit"]')
+    await pI.waitForSelector('button[aria-label="Cómo funciona el panel"]')
+
+    await pI.getByRole('button', { name: 'Editar' }).first().click()
+    const fichaI = pI.locator('main li').first()
+    const nombreI = (await pedirEn(pI, '/api/content')).datos.products[0].nombre
+    await fichaI.getByRole('button', { name: 'Subir nueva' }).click()
+    const bibI = pI.locator('[role="dialog"][aria-label="Elegir imagen"]')
+    await bibI.locator('input[data-subir-imagen]').setInputFiles({
+      name: `${ID}.png`, mimeType: 'image/png', buffer: crearPng(90, 90, [180, 40, 120]),
+    })
+    await bibI.getByRole('button', { name: 'Subir y usar' }).click()
+    await bibI.waitFor({ state: 'detached', timeout: 20000 })
+    await pI.waitForTimeout(500)
+
+    const estadoFoto = async (raiz) => raiz.evaluate((el) => {
+      const img = el.querySelector('img')
+      return { src: img?.currentSrc || img?.src || '', ok: Boolean(img && img.complete && img.naturalWidth > 0) }
+    })
+    const fotoPrincipal = fichaI.locator('[data-miniatura]').first()
+    const ahora = await estadoFoto(fotoPrincipal)
+    inf.check('La foto recién subida se ve al instante en el panel, sin esperar al despliegue',
+      ahora.ok && ahora.src.startsWith('data:image/'), ahora.src.slice(0, 30))
+
+    await pI.getByRole('button', { name: 'Previsualizar' }).click()
+    const vistaI = pI.locator('[role="dialog"][aria-label="Previsualización del sitio"]')
+    await vistaI.waitFor()
+    await pI.waitForTimeout(900)
+    const tarjetaI = vistaI.locator('article', { has: pI.locator(`h3:text-is("${nombreI}")`) }).first()
+    await tarjetaI.scrollIntoViewIfNeeded()
+    await pI.waitForTimeout(600)
+    const enVista = await estadoFoto(tarjetaI)
+    inf.check('Y también en la previsualización', enVista.ok && enVista.src.startsWith('data:image/'), enVista.src.slice(0, 30))
+    await vistaI.getByRole('button', { name: 'Cerrar', exact: true }).click()
+
+    inf.check('El panel nunca pide la dirección pública de una foto aún sin desplegar',
+      !pedidas.some((u) => !/[?&]p=/.test(u)), pedidas.filter((u) => !/[?&]p=/.test(u)).slice(0, 2).join(' · '))
+
+    const medioI = (await pedirEn(pI, '/api/content')).datos.media.find((m) => m.id === ID)
+    inf.check('Al subir, el servidor anota la huella de la foto (su versión)',
+      /^[0-9a-f]{10}$/.test(medioI?.version ?? ''), String(medioI?.version))
+
+    // --- recargar antes del despliegue: ya no queda rota para siempre
+    await pI.getByRole('button', { name: 'Descartar', exact: true }).first().click()
+    await pI.locator('[aria-labelledby="confirmar-titulo"]').getByRole('button', { name: 'Descartar' }).click()
+    await pI.goto(BASE + '/admin', { waitUntil: 'networkidle' })
+    await pI.getByRole('button', { name: 'Imágenes', exact: true }).click()
+    const enBiblioteca = pI.locator('main li', { hasText: ID }).locator('[data-miniatura]')
+    await pI.waitForTimeout(800)
+    inf.check('Antes del despliegue la miniatura dice «Publicándose…», no se queda rota',
+      (await enBiblioteca.getAttribute('data-miniatura')) === 'esperando' &&
+      (await enBiblioteca.innerText()).includes('Publicándose'))
+    inf.check('La miniatura pide la foto con su versión',
+      pedidas.some((u) => u.includes(`v=${medioI?.version}`)))
+
+    desplegado = true
+    await pI.waitForFunction(
+      (id) => [...document.querySelectorAll('main li')].find((li) => li.textContent.includes(id))
+        ?.querySelector('[data-miniatura]')?.getAttribute('data-miniatura') === 'lista',
+      ID, { timeout: 15000 }
+    ).catch(() => {})
+    inf.check('En cuanto termina el despliegue, la miniatura aparece sola',
+      (await enBiblioteca.getAttribute('data-miniatura')) === 'lista')
+
+    await ctxI.close()
   }
 
   // ------------------------------------------------------- responsive ----

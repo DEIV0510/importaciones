@@ -12,7 +12,7 @@
  */
 import { ErrorHttp, exigirAdmin } from './_lib/auth.js'
 import { json, leerCuerpo, manejar, soloMetodos } from './_lib/http.js'
-import { escribir, historial, leerEnCommit } from './_lib/repo.js'
+import { escribir, historial, leer, leerEnCommit } from './_lib/repo.js'
 import {
   validarCategorias, validarMedios, validarProductos, validarSite,
 } from '../src/content/validacion.js'
@@ -72,7 +72,27 @@ export default manejar(async (req, res) => {
   const categories = validarCategorias(antiguo.categories ?? [])
   const products = validarProductos(antiguo.products ?? [], new Set(categories.map((c) => c.id)))
   const site = validarSite(antiguo.site)
-  const media = validarMedios(antiguo.media ?? [])
+
+  // La biblioteca de imágenes NO se restaura: es la de hoy. Restaurar la lista
+  // antigua volvería a anunciar fotos ya borradas (que saldrían rotas) y
+  // olvidaría las subidas después.
+  const media = validarMedios(JSON.parse(await leer(ARCHIVOS.media)))
+  const disponibles = new Set(media.map((m) => m.id))
+  const usadas = [
+    site.identidad.logo,
+    ...site.hero.vitrina.map((v) => v.imagen),
+    ...site.ctaFinal.imagenes,
+    ...categories.map((c) => c.imagen),
+    ...products.flatMap((p) => [p.imagen, ...(p.galeria ?? [])]),
+  ].filter(Boolean)
+  const borradas = [...new Set(usadas.filter((id) => !disponibles.has(id)))]
+  if (borradas.length) {
+    throw new ErrorHttp(
+      422,
+      `Esa versión usa imágenes que ya se borraron: ${borradas.join(', ')}. ` +
+        'Súbelas otra vez con el mismo nombre y vuelve a restaurar.'
+    )
+  }
 
   site.actualizado = new Date().toISOString()
   site.actualizadoPor = sesion.u
@@ -82,7 +102,6 @@ export default manejar(async (req, res) => {
       { ruta: ARCHIVOS.site, contenido: JSON.stringify(site, null, 2) + '\n' },
       { ruta: ARCHIVOS.categories, contenido: JSON.stringify(categories, null, 2) + '\n' },
       { ruta: ARCHIVOS.products, contenido: JSON.stringify(products, null, 2) + '\n' },
-      { ruta: ARCHIVOS.media, contenido: JSON.stringify(media, null, 2) + '\n' },
     ],
     `Contenido: restaura la versión ${sha.slice(0, 7)}\n\nRestaurado por ${sesion.u} desde el panel.`,
     { nombre: sesion.u, email: process.env.GIT_AUTHOR_EMAIL || 'panel@mundoimportaciones.local' }

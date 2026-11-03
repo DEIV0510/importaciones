@@ -6,6 +6,10 @@ import { cargarImagen, generarVariantes, nombreAId } from './imagen'
 import { usosDeImagen } from '../content/validacion'
 import { Boton, Campo, Confirmar, Panel, Vacio, claseInput } from './ui'
 
+/** Cada 5 s durante 3 minutos: de sobra para lo que tarda un despliegue. */
+const REINTENTOS = 36
+const ESPERA_REINTENTO = 5000
+
 /** Miniatura de una imagen de la biblioteca. */
 export function Miniatura({ id, className = '' }) {
   if (!id) {
@@ -15,13 +19,57 @@ export function Miniatura({ id, className = '' }) {
       </div>
     )
   }
+  // key: al cambiar de imagen, los reintentos empiezan de cero
+  return <MiniaturaImagen key={id} id={id} className={className} />
+}
+
+/**
+ * Una imagen que acaba de subirse desde otra pestaña, o antes de recargar, aún
+ * puede no estar desplegada. En vez de quedarse rota para siempre, avisa que
+ * se está publicando y vuelve a pedirla hasta que aparece.
+ */
+function MiniaturaImagen({ id, className }) {
+  const { urlPanel } = useEditor()
+  const [intento, setIntento] = useState(0)
+  const [estado, setEstado] = useState('cargando') // cargando | lista | esperando | fallida
+  const temporizador = useRef(null)
+
+  useEffect(() => () => clearTimeout(temporizador.current), [])
+
+  const src = urlPanel(id, 'sm.webp', intento ? { r: String(intento) } : {})
+
+  const alFallar = () => {
+    if (intento >= REINTENTOS) {
+      setEstado('fallida')
+      return
+    }
+    setEstado('esperando')
+    temporizador.current = setTimeout(() => setIntento((n) => n + 1), ESPERA_REINTENTO)
+  }
+
   return (
-    <img
-      src={`/img/${id}-sm.webp`}
-      alt=""
-      loading="lazy"
-      className={`rounded-lg bg-slate-100 object-contain ${className}`}
-    />
+    <span className={`relative block overflow-hidden rounded-lg bg-slate-100 ${className}`} data-miniatura={estado}>
+      {estado === 'fallida' ? (
+        <span className="grid size-full place-items-center text-slate-400" title="No se pudo cargar la imagen">
+          <ImageOff className="size-5" aria-hidden="true" />
+        </span>
+      ) : (
+        <img
+          src={src}
+          alt=""
+          // Al reintentar no puede ser diferida: oculta, no se pediría nunca
+          loading={intento ? 'eager' : 'lazy'}
+          onLoad={() => setEstado('lista')}
+          onError={alFallar}
+          className={`size-full object-contain ${estado === 'esperando' ? 'invisible' : ''}`}
+        />
+      )}
+      {estado === 'esperando' && (
+        <span className="absolute inset-0 grid place-items-center p-1 text-center text-[0.625rem] leading-tight font-medium text-slate-500">
+          Publicándose…
+        </span>
+      )}
+    </span>
   )
 }
 
@@ -49,7 +97,7 @@ function useCerrarConEscape(onCerrar) {
  *   (p. ej. el nombre del producto), para que nadie tenga que inventarlo.
  */
 export function SubirImagen({ onSubida, altInicial = '' }) {
-  const { medios, sincronizarMedios, avisar, modo } = useEditor()
+  const { medios, sincronizarMedios, registrarReciente, avisar, modo } = useEditor()
   const archivoRef = useRef(null)
   const idNombre = useId()
   const idAlt = useId()
@@ -99,6 +147,8 @@ export function SubirImagen({ onSubida, altInicial = '' }) {
     setSubiendo(true)
     try {
       const res = await api.subirImagen(pendiente.id, pendiente.alt, pendiente.variantes)
+      // Se ve al instante desde el navegador; en el sitio, tras el despliegue
+      registrarReciente(pendiente.id, pendiente.variantes)
       sincronizarMedios(res.medios, res.sha)
       avisar(
         res.reemplazo

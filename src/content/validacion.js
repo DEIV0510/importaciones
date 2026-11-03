@@ -488,6 +488,9 @@ export function validarMedios(entrada) {
     variantes: Array.isArray(m.variantes) ? m.variantes.filter((v) => typeof v === 'string').slice(0, 8) : [],
     bytes: Number.isFinite(m.bytes) ? Math.max(0, Math.round(m.bytes)) : 0,
     origen: m.origen === 'panel' ? 'panel' : 'inicial',
+    // Huella del contenido de la imagen. Va en la dirección (?v=…) para que
+    // reemplazar una foto no deje la vieja en la caché de los navegadores.
+    ...(typeof m.version === 'string' && /^[a-z0-9]{1,16}$/.test(m.version) ? { version: m.version } : {}),
   }))
 }
 

@@ -1,5 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from './api'
+import { rutaImagen, versionesDe } from '../content/imagenes'
+
+const TIPO_VARIANTE = { sm: 'webp', lg: 'webp', fallback: 'png', hero: 'webp' }
+/** Distinto en cada carga del panel (ver urlPanel). */
+const CARGA_DEL_PANEL = Date.now().toString(36)
 
 /**
  * Estado del editor.
@@ -212,15 +217,48 @@ export function EditorProvider({ usuario, children }) {
     if (nuevoSha && nuevoSha !== 'local') setSha(nuevoSha)
   }, [])
 
+  // ----------------------------------------------- imágenes en el panel
+  //
+  // Una foto subida tarda cerca de un minuto en existir en el sitio: hay que
+  // esperar al despliegue. Si el panel la pedía antes, recibía un 404, y como
+  // las imágenes se sirven con caché larga, el navegador guardaba ese «no
+  // existe» durante días: la foto ya estaba publicada y seguía sin cargar.
+  //
+  // Por eso: (1) lo recién subido se muestra desde el propio navegador, con
+  // los mismos archivos que se enviaron; (2) el resto se pide con un parámetro
+  // propio de esta carga del panel, así un 404 pasajero nunca queda guardado
+  // en la dirección que usa el sitio público.
+  const [recientes, setRecientes] = useState({})
+
+  const registrarReciente = useCallback((id, variantes) => {
+    const urls = {}
+    for (const [v, base64] of Object.entries(variantes ?? {})) {
+      const tipo = TIPO_VARIANTE[v]
+      if (tipo) urls[`${v}.${tipo}`] = `data:image/${tipo};base64,${base64}`
+    }
+    setRecientes((r) => ({ ...r, [id]: urls }))
+  }, [])
+
+  const versiones = useMemo(() => versionesDe(borrador?.media), [borrador?.media])
+
+  /** Dirección de una imagen para el panel y su previsualización. */
+  const urlPanel = useCallback(
+    (id, archivo, extra = {}) =>
+      recientes[id]?.[archivo] ??
+      rutaImagen(id, archivo, versiones[id], { p: CARGA_DEL_PANEL, ...extra }),
+    [recientes, versiones]
+  )
+
   const valor = useMemo(
     () => ({
       usuario, publicado, borrador, sha, modo, cargando, guardando, error, sucio, avisos,
       set, get, publicar, descartar, recargar: cargar, avisar, sincronizarMedios,
+      registrarReciente, urlPanel,
       site: borrador?.site, categorias: borrador?.categories,
       productos: borrador?.products, medios: borrador?.media,
     }),
     [usuario, publicado, borrador, sha, modo, cargando, guardando, error, sucio, avisos,
-     set, get, publicar, descartar, cargar, avisar, sincronizarMedios]
+     set, get, publicar, descartar, cargar, avisar, sincronizarMedios, registrarReciente, urlPanel]
   )
 
   return <EditorContext.Provider value={valor}>{children}</EditorContext.Provider>

@@ -1,8 +1,9 @@
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { rutaImagen, versionesDe } from './src/content/imagenes.js'
 
 // Las funciones de /api leen process.env. En producción lo rellena Vercel;
 // en local, el archivo .env (que nunca se sube al repositorio).
@@ -52,9 +53,26 @@ function apiEnDesarrollo() {
   }
 }
 
+/**
+ * La precarga del logo en index.html debe pedir exactamente la misma dirección
+ * que el componente Logo, versión incluida (?v=…); si no, el navegador lo
+ * descarga dos veces y avisa de una precarga sin usar.
+ */
+function precargaDelLogo() {
+  return {
+    name: 'precarga-del-logo',
+    transformIndexHtml(html) {
+      const leer = (f) => JSON.parse(readFileSync(resolve(import.meta.dirname, 'src/content', f), 'utf8'))
+      const logo = leer('site.json').identidad?.logo || 'logo'
+      const ruta = rutaImagen(logo, 'sm.webp', versionesDe(leer('media.json'))[logo])
+      return html.replace('href="/img/logo-sm.webp"', `href="${ruta}"`)
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), apiEnDesarrollo()],
+  plugins: [react(), tailwindcss(), apiEnDesarrollo(), precargaDelLogo()],
   server: {
     port: 5254,
     strictPort: false,
