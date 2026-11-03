@@ -295,6 +295,18 @@
     "origen": "inicial"
   },
   {
+    "id": "millare-02",
+    "alt": "Millaré navideño",
+    "variantes": [
+      "sm",
+      "lg",
+      "fallback",
+      "hero"
+    ],
+    "bytes": 720241,
+    "origen": "panel"
+  },
+  {
     "id": "millare-dorado",
     "alt": "Millare dorado",
     "variantes": [
