@@ -296,7 +296,7 @@
   },
   {
     "id": "millare-02",
-    "alt": "Millaré navideño",
+    "alt": "MILLARE CYC-002 CM X 18 METROS",
     "variantes": [
       "sm",
       "lg",
@@ -304,7 +304,8 @@
       "hero"
     ],
     "bytes": 720241,
-    "origen": "panel"
+    "origen": "panel",
+    "version": "1d3bbc6f03"
   },
   {
     "id": "millare-dorado",
