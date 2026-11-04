@@ -145,8 +145,9 @@
       "fallback",
       "hero"
     ],
-    "bytes": 886994,
-    "origen": "panel"
+    "bytes": 888213,
+    "origen": "panel",
+    "version": "cf70a4b45e"
   },
   {
     "id": "cyc003",
