@@ -149,6 +149,19 @@
     "origen": "panel"
   },
   {
+    "id": "cyc003",
+    "alt": "MILLARE CYC-003 3.5CM X 18 METROS",
+    "variantes": [
+      "sm",
+      "lg",
+      "fallback",
+      "hero"
+    ],
+    "bytes": 1043484,
+    "origen": "panel",
+    "version": "8744b2b7e2"
+  },
+  {
     "id": "cyc012-2",
     "alt": "MILLARE CYC-002 CM X 18 METROS",
     "variantes": [
