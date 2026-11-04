@@ -308,6 +308,19 @@
     "version": "1d3bbc6f03"
   },
   {
+    "id": "millare-03",
+    "alt": "MILLARE CYC-003 3.5CM X 18 METROS",
+    "variantes": [
+      "sm",
+      "lg",
+      "fallback",
+      "hero"
+    ],
+    "bytes": 737831,
+    "origen": "panel",
+    "version": "2474421da6"
+  },
+  {
     "id": "millare-dorado",
     "alt": "Millare dorado",
     "variantes": [
