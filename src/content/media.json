@@ -189,6 +189,19 @@
     "version": "a375107f4d"
   },
   {
+    "id": "cyc009",
+    "alt": "MILLARE CYC-009  1.5CMx 18 METROS",
+    "variantes": [
+      "sm",
+      "lg",
+      "fallback",
+      "hero"
+    ],
+    "bytes": 907805,
+    "origen": "panel",
+    "version": "1263ab26c3"
+  },
+  {
     "id": "cyc012-2",
     "alt": "MILLARE CYC-002 CM X 18 METROS",
     "variantes": [
