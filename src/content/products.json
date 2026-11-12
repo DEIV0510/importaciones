@@ -1,7 +1,7 @@
 [
   {
     "id": "millare",
-    "nombre": "MILLARE CYC-002 CM X 18 METROS",
+    "nombre": "MILLARE CYC-002 2CM X 18 METROS",
     "categorias": [
       "adornos"
     ],
@@ -19,17 +19,77 @@
   },
   {
     "id": "millare-navideno",
-    "nombre": "Millaré navideño",
+    "nombre": "MILLARE CYC-003 3.5CM X 18 METROS",
     "categorias": [
       "adornos"
     ],
-    "imagen": "millare-02",
+    "imagen": "cyc003",
     "galeria": null,
     "descripcion": "Millaré en combinación de colores navideños para trabajos de temporada.",
-    "precio": null,
-    "precioUnidad": null,
+    "precio": 22500,
+    "precioUnidad": "PAQUETE",
     "destacado": true,
     "visible": true,
     "orden": 3
+  },
+  {
+    "id": "producto-1794495283796",
+    "nombre": "MILLARE CYC-004 1.5CM X 18 METROS",
+    "categorias": [
+      "adornos"
+    ],
+    "imagen": "cyc004",
+    "galeria": null,
+    "descripcion": null,
+    "precio": 12000,
+    "precioUnidad": "paquete",
+    "destacado": false,
+    "visible": true,
+    "orden": 2
+  },
+  {
+    "id": "producto-1794495285221",
+    "nombre": "Nuevo producto",
+    "categorias": [
+      "confeccion"
+    ],
+    "imagen": null,
+    "galeria": null,
+    "descripcion": null,
+    "precio": null,
+    "precioUnidad": null,
+    "destacado": false,
+    "visible": true,
+    "orden": 3
+  },
+  {
+    "id": "producto-1794495303131",
+    "nombre": "Nuevo producto",
+    "categorias": [
+      "confeccion"
+    ],
+    "imagen": null,
+    "galeria": null,
+    "descripcion": null,
+    "precio": null,
+    "precioUnidad": null,
+    "destacado": false,
+    "visible": true,
+    "orden": 4
+  },
+  {
+    "id": "producto-1794499571125",
+    "nombre": "Nuevo producto",
+    "categorias": [
+      "confeccion"
+    ],
+    "imagen": null,
+    "galeria": null,
+    "descripcion": null,
+    "precio": null,
+    "precioUnidad": null,
+    "destacado": false,
+    "visible": true,
+    "orden": 5
   }
 ]
