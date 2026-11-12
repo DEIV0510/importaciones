@@ -73,7 +73,7 @@
     "descripcion": null,
     "precio": 11500,
     "precioUnidad": "PAQUETE",
-    "destacado": false,
+    "destacado": true,
     "visible": true,
     "orden": 4
   },
