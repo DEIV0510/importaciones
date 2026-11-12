@@ -136,7 +136,18 @@ Los cambios se guardan **solo en tu navegador** hasta que pulsas *Publicar*.
 Puedes cerrar la pestaña y seguir después; el panel avisa si te vas con cambios
 sin publicar.
 
-- *Previsualizar* monta el sitio real con tus cambios, no una imitación.
+- *Previsualizar* monta el sitio real con tus cambios, no una imitación. Abre
+  en la sección que estás editando (desde *Catálogo*, en los productos; antes
+  abría siempre en la portada y los productos nuevos quedaban cuatro pantallas
+  más abajo). Arriba tiene botones para saltar a Inicio, Productos y Contacto.
+- **Después de publicar**, una franja bajo la cabecera dice «Publicando en el
+  sitio…» y pasa a «Listo: tus cambios ya se ven en el sitio» cuando el sitio en
+  vivo ya los sirve (suele tardar un minuto). Si pasan 4 minutos, avisa de que va
+  lento. Funciona así: el servidor devuelve la huella de lo publicado
+  (`api/_lib/huella.js`) y la compilación publica la suya en `/version.json`;
+  el panel consulta hasta que coinciden.
+- Al publicar, el panel avisa de productos sin terminar (con el nombre
+  «Nuevo producto», sin foto o sin línea). Se puede publicar igual.
 - *Descartar cambios* vuelve a lo publicado.
 - Si el contenido cambia mientras editas (otra persona publicó), el panel no
   publica a ciegas: **conserva tu borrador**, avisa, y solo si vuelves a pulsar

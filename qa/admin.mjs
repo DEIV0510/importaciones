@@ -12,6 +12,7 @@
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { crc32, deflateSync } from 'node:zlib'
 import { abrirNavegador, crearInforme } from './lib.mjs'
+import { ARCHIVOS_HUELLA, huellaContenido } from '../api/_lib/huella.js'
 
 const BASE = (process.env.QA_ADMIN_URL || 'http://localhost:5254').replace(/\/+$/, '')
 const CONTRASENA = process.env.QA_PASSWORD || 'panel-local-12345'
@@ -220,6 +221,10 @@ try {
     cuerpo: conCambio((c) => { c.site.hero.chipTexto = MARCA }),
   })
   inf.check('Publica un cambio válido', r.estado === 200, `HTTP ${r.estado} — ${r.datos?.error ?? ''}`)
+  // La misma huella que tendrá /version.json del sitio compilado con estos archivos
+  const huellaEnDisco = huellaContenido(ARCHIVOS_HUELLA.map((ruta) => readFileSync(ruta, 'utf8')))
+  inf.check('Publicar devuelve la huella de lo que quedó escrito',
+    r.datos?.contenido === huellaEnDisco, `${r.datos?.contenido} vs ${huellaEnDisco}`)
 
   const enDisco = JSON.parse(readFileSync(RUTA_SITE, 'utf8'))
   inf.check('El cambio queda escrito en el archivo', enDisco.hero.chipTexto === MARCA)
@@ -762,7 +767,7 @@ try {
       publicaciones.at(-1)?.sha === 'sha-nuevo-xyz', String(publicaciones.at(-1)?.sha))
     inf.check('Y ese segundo intento sí queda publicado',
       (await pV.getByText('Tienes cambios sin publicar').count()) === 0 &&
-      (await pV.getByText('Publicado. El sitio se está reconstruyendo').first().isVisible()))
+      (await pV.getByText('Publicado. Te avisamos aquí arriba').first().isVisible()))
 
     // --- 3. Un borrador guardado con otra versión se recupera (antes se perdía en silencio)
     const actual = (await pedirEn(pV, '/api/content')).datos
@@ -891,6 +896,126 @@ try {
       (await enBiblioteca.getAttribute('data-miniatura')) === 'lista')
 
     await ctxI.close()
+  }
+
+  // --------------------- después de publicar: ¿ya está en el sitio? y previsualizar ---
+  // Lo que reportó el dueño: publicaba, previsualizaba y no veía sus productos.
+  // La publicación y /version.json se simulan en el navegador: no se toca el disco.
+  {
+    const ctxD = await navegador.newContext({ viewport: { width: 1366, height: 820 }, locale: 'es-CO' })
+    await ctxD.addInitScript(() => {
+      try { localStorage.setItem('mi_panel_guia_vista_v1', '1') } catch { /* sin almacenamiento */ }
+    })
+    let consultasVersion = 0
+    await ctxD.route('**/version.json*', (route) => {
+      consultasVersion++
+      // Las dos primeras veces el sitio aún sirve lo anterior (despliegue en curso)
+      const contenido = consultasVersion <= 2 ? 'huella-vieja' : 'huella-nueva-1'
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ contenido }) })
+    })
+    await ctxD.route('**/api/content', (route) => {
+      if (route.request().method() !== 'PUT') return route.continue()
+      return route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({ ok: true, sha: 'sha-d1', local: false, contenido: 'huella-nueva-1' }),
+      })
+    })
+    const pD = await ctxD.newPage()
+    pD.on('pageerror', (e) => erroresConsola.push(`[publicar] ${e.message}`))
+    pD.on('console', (m) => {
+      if (m.type() !== 'error' || /status of (401|403|404|409|422)/.test(m.text())) return
+      erroresConsola.push(`[publicar] ${m.text()}`)
+    })
+    await pD.goto(BASE + '/admin', { waitUntil: 'networkidle' })
+    await pD.fill('#usuario', 'admin')
+    await pD.fill('#contrasena', CONTRASENA)
+    await pD.click('button[type="submit"]')
+    await pD.waitForSelector('button[aria-label="Cómo funciona el panel"]')
+
+    // --- un producto recién creado y sin tocar avisa antes de publicarse
+    await pD.getByRole('button', { name: 'Nuevo', exact: true }).click()
+    await pD.getByRole('button', { name: 'Publicar', exact: true }).click()
+    const dlgD = pD.locator('[aria-labelledby="publicar-titulo"]')
+    const avisoSinTerminar = (await dlgD.locator('[data-sin-terminar]').textContent().catch(() => '')) ?? ''
+    inf.check('Publicar avisa de un producto sin terminar',
+      avisoSinTerminar.includes('«Nuevo producto»: sin nombre propio, sin foto'), avisoSinTerminar.slice(0, 80))
+
+    // --- tras publicar, el panel dice cuándo ya se ve en el sitio
+    await dlgD.getByRole('button', { name: 'Publicar' }).click()
+    const banda = pD.locator('[data-despliegue]')
+    // Si la banda no aparece, que quede como FALLA y no como un error que corta la prueba
+    const leerBanda = async () =>
+      (await banda.count())
+        ? { estado: await banda.getAttribute('data-despliegue'), texto: await banda.innerText() }
+        : { estado: null, texto: '' }
+    await banda.waitFor({ timeout: 5000 }).catch(() => {})
+    let b = await leerBanda()
+    inf.check('Tras publicar, avisa que se está publicando en el sitio',
+      b.estado === 'publicando' && b.texto.includes('Publicando en el sitio'), String(b.estado))
+    await pD.locator('[data-despliegue="listo"]').waitFor({ timeout: 20000 }).catch(() => {})
+    b = await leerBanda()
+    inf.check('Y cuando el sitio ya sirve lo publicado, lo dice',
+      b.estado === 'listo' && b.texto.includes('ya se ven en el sitio'), `tras ${consultasVersion} consultas`)
+    if (b.estado === 'listo') {
+      const enlaceSitio = banda.getByRole('link', { name: 'Ver el sitio' })
+      inf.check('Con un enlace al sitio en otra pestaña',
+        (await enlaceSitio.getAttribute('href')) === '/' && (await enlaceSitio.getAttribute('target')) === '_blank')
+      await banda.getByRole('button', { name: 'Cerrar este aviso' }).click()
+      inf.check('El aviso se puede cerrar', (await pD.locator('[data-despliegue]').count()) === 0)
+    }
+
+    // --- previsualizar desde Catálogo abre en los productos, no en la portada
+    const posicionEnVista = (id) =>
+      pD.evaluate((sel) => {
+        const dlg = document.querySelector('[aria-label="Previsualización del sitio"]')
+        const caja = dlg.querySelector('.overflow-auto')
+        const el = dlg.querySelector(sel)
+        return { arriba: Math.round(el.getBoundingClientRect().top - caja.getBoundingClientRect().top), scroll: Math.round(caja.scrollTop) }
+      }, id)
+    await pD.getByRole('button', { name: 'Previsualizar' }).click()
+    const vistaD = pD.locator('[role="dialog"][aria-label="Previsualización del sitio"]')
+    await vistaD.waitFor()
+    await pD.waitForTimeout(1200)
+    let pos = await posicionEnVista('#catalogo')
+    inf.check('Previsualizar desde Catálogo abre en los productos', pos.scroll > 0 && pos.arriba >= 0 && pos.arriba < 260,
+      `catálogo a ${pos.arriba}px del borde, scroll ${pos.scroll}`)
+    await vistaD.getByRole('navigation', { name: 'Ir a una sección' }).getByRole('button', { name: 'Inicio' }).click()
+    await pD.waitForTimeout(400)
+    pos = await posicionEnVista('#inicio')
+    inf.check('El botón Inicio de la previsualización lleva a la portada', pos.scroll === 0)
+    await vistaD.getByRole('navigation', { name: 'Ir a una sección' }).getByRole('button', { name: 'Productos' }).click()
+    await pD.waitForTimeout(400)
+    pos = await posicionEnVista('#catalogo')
+    inf.check('El botón Productos vuelve al catálogo', pos.arriba >= 0 && pos.arriba < 260, `${pos.arriba}px`)
+    await vistaD.getByRole('button', { name: 'Cerrar', exact: true }).click()
+
+    await pD.getByRole('button', { name: 'Portada', exact: true }).click()
+    await pD.getByRole('button', { name: 'Previsualizar' }).click()
+    await vistaD.waitFor()
+    await pD.waitForTimeout(1000)
+    pos = await posicionEnVista('#inicio')
+    inf.check('Previsualizar desde Portada abre arriba', pos.scroll === 0)
+    await vistaD.getByRole('button', { name: 'Cerrar', exact: true }).click()
+
+    // --- la vitrina de la portada avisa si muestra fotos de productos que ya no están
+    inf.check('La vitrina no avisa cuando sus fotos están en el catálogo',
+      (await pD.locator('[data-vitrina-desactualizada]').count()) === 0)
+    await pD.getByRole('button', { name: 'Catálogo', exact: true }).click()
+    const usaFotoVitrina = (await pedirEn(pD, '/api/content')).datos
+    const piezaVitrina = usaFotoVitrina.site.hero.vitrina[0]
+    const productoDeVitrina = usaFotoVitrina.products.find(
+      (p) => p.imagen === piezaVitrina.imagen || (p.galeria ?? []).includes(piezaVitrina.imagen)
+    )
+    await pD.getByPlaceholder('Buscar…').fill(productoDeVitrina.nombre)
+    await pD.locator('main li').first().getByRole('button', { name: 'Editar' }).click()
+    await pD.getByRole('button', { name: 'Eliminar producto' }).click()
+    await pD.getByRole('button', { name: 'Portada', exact: true }).click()
+    const avisoVitrina = pD.locator('[data-vitrina-desactualizada]')
+    inf.check('Si se borra el producto, la vitrina avisa que muestra su foto',
+      (await avisoVitrina.count()) === 1 && (await avisoVitrina.innerText()).includes(piezaVitrina.label),
+      piezaVitrina.label)
+
+    await ctxD.close()
   }
 
   // ------------------------------------------------------- responsive ----

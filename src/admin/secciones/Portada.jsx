@@ -10,11 +10,21 @@ const FORMAS = [
 ]
 
 export default function Portada() {
-  const { site, set } = useEditor()
+  const { site, set, productos } = useEditor()
   const hero = site?.hero ?? {}
   const pilares = hero.pilares ?? []
   const vitrina = hero.vitrina ?? []
   const items = site?.marquesina?.items ?? []
+
+  // La vitrina no se actualiza sola: si se borran productos, puede seguir
+  // mostrando sus fotos en lo primero que ve el visitante.
+  const fotosDelCatalogo = new Set(
+    (productos ?? [])
+      .filter((p) => p.visible !== false)
+      .flatMap((p) => [p.imagen, ...(p.galeria ?? [])])
+      .filter(Boolean)
+  )
+  const fueraDelCatalogo = vitrina.filter((v) => v.imagen && !fotosDelCatalogo.has(v.imagen))
 
   return (
     <div className="grid gap-5">
@@ -69,6 +79,20 @@ export default function Portada() {
         titulo="Vitrina de productos"
         descripcion="Los paneles de vidrio de la portada. Elige la forma según la foto: los rollos altos lucen en vertical y los elásticos en ancha. En el móvil solo se ven las cuatro primeras."
       >
+        {fueraDelCatalogo.length > 0 && (
+          <div data-vitrina-desactualizada className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <p className="font-semibold">
+              {fueraDelCatalogo.length === 1
+                ? 'Una foto de la vitrina no está en el catálogo actual'
+                : `${fueraDelCatalogo.length} fotos de la vitrina no están en el catálogo actual`}
+            </p>
+            <p className="mt-1 text-amber-800">
+              {fueraDelCatalogo.map((v) => v.label || v.imagen).join(', ')}. Es lo primero que ve
+              quien entra: si ya no vendes esos productos, cámbialas por fotos de los tuyos.
+              Revisa también la banda de líneas de abajo, que tampoco se actualiza sola.
+            </p>
+          </div>
+        )}
         <Lista
           ruta="site.hero.vitrina"
           items={vitrina}
@@ -83,7 +107,7 @@ export default function Portada() {
                 </p>
               )}
               <SelectorImagen ruta={`site.hero.vitrina.${i}.imagen`} etiqueta="Imagen"
-                ayuda="Necesita la variante «hero»: súbela desde Medios para generarla." />
+                ayuda="Cualquier foto de la biblioteca sirve: si no tiene recorte para la portada, se usa la del catálogo." />
               <Fila>
                 <Texto ruta={`site.hero.vitrina.${i}.label`} etiqueta="Etiqueta sobre la foto" max={40} />
                 <Selector ruta={`site.hero.vitrina.${i}.forma`} etiqueta="Forma del panel" opciones={FORMAS} />

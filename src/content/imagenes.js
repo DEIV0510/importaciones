@@ -22,6 +22,28 @@ export function versionesDe(medios) {
 }
 
 /**
+ * El archivo que de verdad existe para esa imagen.
+ *
+ * No todas tienen todas las variantes: 22 fotos originales no tienen recorte
+ * para la portada («hero»), y las subidas por el panel lo tienen solo en WebP.
+ * Si la vitrina de la portada pedía una de esas, salía rota. Ahora se usa la
+ * foto del catálogo en su lugar.
+ *
+ * @param {{variantes?:string[]}|undefined} medio  Entrada de la biblioteca.
+ * @param {string} archivo  Variante y extensión pedidas (p. ej. 'hero.webp').
+ */
+export function archivoDisponible(medio, archivo) {
+  if (!medio) return archivo
+  const [variante, ext] = archivo.split('.')
+  const tiene = (v) => (medio.variantes ?? []).includes(v)
+  // El respaldo PNG de la portada solo existe en algunas originales: el del
+  // catálogo existe siempre.
+  if (variante === 'hero' && ext === 'png') return 'fallback.png'
+  if (tiene(variante)) return archivo
+  return ext === 'png' ? 'fallback.png' : 'lg.webp'
+}
+
+/**
  * @param {string} id       Identificador de la imagen (p. ej. 'cinta-faya-clasica').
  * @param {string} archivo  Variante y extensión (p. ej. 'sm.webp', 'fallback.png').
  * @param {string} [version]

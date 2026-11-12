@@ -1,10 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from './api'
-import { rutaImagen, versionesDe } from '../content/imagenes'
+import { archivoDisponible, rutaImagen, versionesDe } from '../content/imagenes'
 
 const TIPO_VARIANTE = { sm: 'webp', lg: 'webp', fallback: 'png', hero: 'webp' }
 /** Distinto en cada carga del panel (ver urlPanel). */
 const CARGA_DEL_PANEL = Date.now().toString(36)
+/** Un despliegue normal tarda ~1 min; pasados 4, se avisa de que va lento. */
+const LIMITE_DESPLIEGUE = 4 * 60 * 1000
 
 /**
  * Estado del editor.
@@ -149,6 +151,48 @@ export function EditorProvider({ usuario, children }) {
 
   const get = useCallback((ruta) => obtener(borrador, ruta), [borrador])
 
+  // --------------------------------------------- seguimiento del despliegue
+  //
+  // Publicar es un commit: el sitio tarda cerca de un minuto en mostrarlo. El
+  // dueño miraba el sitio enseguida, no veía sus productos y creía que no se
+  // habían publicado. Ahora el panel consulta /version.json hasta que el sitio
+  // en vivo sirve la huella de lo publicado, y entonces lo dice.
+  const [despliegue, setDespliegue] = useState(null) // { huella, estado, desde }
+
+  const seguirDespliegue = useCallback((huella) => {
+    if (huella) setDespliegue({ huella, estado: 'publicando', desde: Date.now() })
+  }, [])
+  const cerrarDespliegue = useCallback(() => setDespliegue(null), [])
+
+  useEffect(() => {
+    if (despliegue?.estado !== 'publicando') return
+    const { huella, desde } = despliegue
+    let vigente = true
+    let temporizador
+    const cambiar = (estado) =>
+      setDespliegue((d) => (d?.huella === huella ? { ...d, estado } : d))
+
+    const revisar = async () => {
+      try {
+        const r = await fetch(`/version.json?t=${Date.now()}`, { cache: 'no-store' })
+        if (r.ok && (await r.json()).contenido === huella) {
+          if (vigente) cambiar('listo')
+          return
+        }
+      } catch {
+        // Sin red un momento: se vuelve a intentar
+      }
+      if (!vigente) return
+      if (Date.now() - desde > LIMITE_DESPLIEGUE) {
+        cambiar('lento')
+        return
+      }
+      temporizador = setTimeout(revisar, 4000)
+    }
+    temporizador = setTimeout(revisar, 3000)
+    return () => { vigente = false; clearTimeout(temporizador) }
+  }, [despliegue])
+
   const publicar = useCallback(
     async (mensaje) => {
       setGuardando(true)
@@ -157,11 +201,12 @@ export function EditorProvider({ usuario, children }) {
         setPublicado(clonar(borrador))
         setSha(res.sha)
         try { localStorage.removeItem(CLAVE_BORRADOR) } catch { /* sin almacenamiento */ }
-        avisar(
-          res.local
-            ? 'Guardado en el disco local (modo desarrollo).'
-            : 'Publicado. El sitio se está reconstruyendo: espera cerca de un minuto y recárgalo.'
-        )
+        if (res.local) {
+          avisar('Guardado en el disco local (modo desarrollo).')
+        } else {
+          seguirDespliegue(res.contenido)
+          avisar('Publicado. Te avisamos aquí arriba en cuanto ya se vea en el sitio.')
+        }
         return true
       } catch (err) {
         if (err.estado === 409) {
@@ -194,7 +239,7 @@ export function EditorProvider({ usuario, children }) {
         setGuardando(false)
       }
     },
-    [borrador, sha, avisar]
+    [borrador, sha, avisar, seguirDespliegue]
   )
 
   const descartar = useCallback(() => {
@@ -240,25 +285,35 @@ export function EditorProvider({ usuario, children }) {
   }, [])
 
   const versiones = useMemo(() => versionesDe(borrador?.media), [borrador?.media])
+  const mediosPorId = useMemo(
+    () => Object.fromEntries((borrador?.media ?? []).map((m) => [m.id, m])),
+    [borrador?.media]
+  )
 
   /** Dirección de una imagen para el panel y su previsualización. */
   const urlPanel = useCallback(
-    (id, archivo, extra = {}) =>
-      recientes[id]?.[archivo] ??
-      rutaImagen(id, archivo, versiones[id], { p: CARGA_DEL_PANEL, ...extra }),
-    [recientes, versiones]
+    (id, archivo, extra = {}) => {
+      // Igual que el sitio: si la imagen no tiene esa variante, la que sí exista
+      const real = archivoDisponible(mediosPorId[id], archivo)
+      return (
+        recientes[id]?.[real] ??
+        rutaImagen(id, real, versiones[id], { p: CARGA_DEL_PANEL, ...extra })
+      )
+    },
+    [recientes, versiones, mediosPorId]
   )
 
   const valor = useMemo(
     () => ({
       usuario, publicado, borrador, sha, modo, cargando, guardando, error, sucio, avisos,
       set, get, publicar, descartar, recargar: cargar, avisar, sincronizarMedios,
-      registrarReciente, urlPanel,
+      registrarReciente, urlPanel, despliegue, seguirDespliegue, cerrarDespliegue,
       site: borrador?.site, categorias: borrador?.categories,
       productos: borrador?.products, medios: borrador?.media,
     }),
     [usuario, publicado, borrador, sha, modo, cargando, guardando, error, sucio, avisos,
-     set, get, publicar, descartar, cargar, avisar, sincronizarMedios, registrarReciente, urlPanel]
+     set, get, publicar, descartar, cargar, avisar, sincronizarMedios, registrarReciente, urlPanel,
+     despliegue, seguirDespliegue, cerrarDespliegue]
   )
 
   return <EditorContext.Provider value={valor}>{children}</EditorContext.Provider>

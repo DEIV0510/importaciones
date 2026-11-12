@@ -14,6 +14,8 @@ import {
   anclasDisponibles, precio, PRECIO_MAXIMO,
 } from '../src/content/validacion.js'
 import { formatearPrecio } from '../src/content/formato.js'
+import { archivoDisponible } from '../src/content/imagenes.js'
+import { ARCHIVOS_HUELLA, huellaContenido } from '../api/_lib/huella.js'
 
 const leer = (f) => JSON.parse(readFileSync(`src/content/${f}`, 'utf8'))
 
@@ -181,5 +183,35 @@ inf.check('El formato separa los miles con punto',
   formatearPrecio(12500) === '$12.500' && formatearPrecio(1250000) === '$1.250.000')
 inf.check('Sin precio válido el formato es vacío',
   [null, 0, -1, 1.5, undefined].every((v) => formatearPrecio(v) === ''))
+
+// ------------------------------------------- cada imagen pide un archivo que existe
+// 22 fotos originales no tienen recorte para la portada y las subidas por el
+// panel no tienen ese recorte en PNG: la vitrina las pedía y salían rotas.
+const PEDIDOS = ['sm.webp', 'lg.webp', 'fallback.png', 'hero.webp', 'hero.png']
+const inexistentes = []
+for (const m of medios) {
+  for (const archivo of PEDIDOS) {
+    const real = archivoDisponible(m, archivo)
+    if (!existsSync(`public/img/${m.id}-${real}`)) inexistentes.push(`${m.id} (${archivo} → ${real})`)
+  }
+}
+inf.check('Cualquier variante que pida el sitio existe para toda la biblioteca',
+  inexistentes.length === 0, inexistentes.slice(0, 4).join(', '))
+inf.check('Sin recorte de portada se usa la foto del catálogo',
+  archivoDisponible({ variantes: ['sm', 'lg', 'fallback'] }, 'hero.webp') === 'lg.webp' &&
+  archivoDisponible({ variantes: ['sm', 'lg', 'fallback', 'hero'] }, 'hero.webp') === 'hero.webp' &&
+  archivoDisponible({ variantes: ['sm', 'lg', 'fallback', 'hero'] }, 'hero.png') === 'fallback.png' &&
+  archivoDisponible(undefined, 'sm.webp') === 'sm.webp')
+
+// ---------------------------------------------- huella del contenido publicado
+// La calculan el servidor al publicar y la compilación (/version.json); si no
+// coincidieran, el panel nunca diría «ya está en el sitio».
+// En Windows el repositorio se baja con CRLF; en Vercel, con LF
+const textos = ARCHIVOS_HUELLA.map((r) => readFileSync(r, 'utf8').replace(/\r\n/g, '\n'))
+inf.check('La huella del contenido es estable y no depende de saltos de línea CRLF',
+  huellaContenido(textos) === huellaContenido(textos.map((t) => t.replace(/\n/g, '\r\n'))) &&
+  /^[0-9a-f]{12}$/.test(huellaContenido(textos)))
+inf.check('La huella cambia si cambia un producto',
+  huellaContenido(textos) !== huellaContenido([textos[0], textos[1], textos[2].replace('"', '" ')]))
 
 process.exit(inf.resumen() ? 0 : 1)

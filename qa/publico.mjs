@@ -4,7 +4,9 @@
  *   npm run qa:publico            (contra http://localhost:4180)
  *   QA_URL=https://… npm run qa:publico
  */
+import { readFileSync } from 'node:fs'
 import { abrirNavegador, asentar, crearInforme, URL_BASE } from './lib.mjs'
+import { ARCHIVOS_HUELLA, huellaContenido } from '../api/_lib/huella.js'
 
 const ANCHOS = [
   { nombre: 'escritorio-1920', w: 1920, h: 1080 },
@@ -158,6 +160,21 @@ for (const vp of ANCHOS) {
   inf.check('El modal cierra con Escape', (await page.locator('[role="dialog"]').count()) === 0)
 
   await ctx.close()
+}
+
+// ------------------------------------------------------ versión publicada ---
+// Tras publicar, el panel consulta /version.json para decir «ya está en el
+// sitio». Debe existir, no cachearse y llevar la huella del contenido compilado.
+{
+  const res = await fetch(`${URL_BASE}/version.json?t=${Date.now()}`)
+  const datos = res.ok ? await res.json().catch(() => null) : null
+  inf.check('El sitio publica su versión de contenido (/version.json)', Boolean(datos?.contenido), `HTTP ${res.status}`)
+  if (!process.env.QA_URL) {
+    // En local se compila desde estos mismos archivos: deben coincidir
+    const enDisco = huellaContenido(ARCHIVOS_HUELLA.map((r) => readFileSync(r, 'utf8')))
+    inf.check('Esa versión es la huella del contenido compilado', datos?.contenido === enDisco,
+      `${datos?.contenido} vs ${enDisco}`)
+  }
 }
 
 await navegador.close()

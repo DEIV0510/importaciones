@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { rutaImagen, versionesDe } from './src/content/imagenes.js'
+import { ARCHIVOS_HUELLA, huellaContenido } from './api/_lib/huella.js'
 
 // Las funciones de /api leen process.env. En producción lo rellena Vercel;
 // en local, el archivo .env (que nunca se sube al repositorio).
@@ -70,9 +71,35 @@ function precargaDelLogo() {
   }
 }
 
+/**
+ * /version.json: la huella del contenido que lleva esta compilación.
+ *
+ * Tras publicar, el panel la consulta hasta que coincide con la que le dio el
+ * servidor. Así sabe cuándo el despliegue terminó y puede decir «ya se ve en
+ * el sitio», en vez de que el dueño mire el sitio antes de tiempo y crea que
+ * no se publicó.
+ */
+function versionDelContenido() {
+  const huella = () =>
+    huellaContenido(ARCHIVOS_HUELLA.map((r) => readFileSync(resolve(import.meta.dirname, r), 'utf8')))
+  return {
+    name: 'version-del-contenido',
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ contenido: huella() }) })
+    },
+    configureServer(server) {
+      server.middlewares.use('/version.json', (req, res) => {
+        res.setHeader('Content-Type', 'application/json; charset=utf-8')
+        res.setHeader('Cache-Control', 'no-store')
+        res.end(JSON.stringify({ contenido: huella() }))
+      })
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), apiEnDesarrollo(), precargaDelLogo()],
+  plugins: [react(), tailwindcss(), apiEnDesarrollo(), precargaDelLogo(), versionDelContenido()],
   server: {
     port: 5254,
     strictPort: false,

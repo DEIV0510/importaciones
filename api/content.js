@@ -10,6 +10,7 @@
 import { ErrorHttp, exigirAdmin } from './_lib/auth.js'
 import { json, leerCuerpo, manejar, soloMetodos } from './_lib/http.js'
 import { escribir, leer, sha as shaActual } from './_lib/repo.js'
+import { huellaContenido } from './_lib/huella.js'
 import {
   ErrorValidacion, validarCategorias, validarMedios, validarProductos, validarSite,
 } from '../src/content/validacion.js'
@@ -85,11 +86,12 @@ export default manejar(async (req, res) => {
     `Publicado por ${sesion.u} desde el panel de administración.`,
   ].join('\n')
 
+  const textos = [site, categories, products].map((x) => JSON.stringify(x, null, 2) + '\n')
   const resultado = await escribir(
     [
-      { ruta: ARCHIVOS.site, contenido: JSON.stringify(site, null, 2) + '\n' },
-      { ruta: ARCHIVOS.categories, contenido: JSON.stringify(categories, null, 2) + '\n' },
-      { ruta: ARCHIVOS.products, contenido: JSON.stringify(products, null, 2) + '\n' },
+      { ruta: ARCHIVOS.site, contenido: textos[0] },
+      { ruta: ARCHIVOS.categories, contenido: textos[1] },
+      { ruta: ARCHIVOS.products, contenido: textos[2] },
     ],
     mensaje,
     { nombre: sesion.u, email: process.env.GIT_AUTHOR_EMAIL || 'panel@mundoimportaciones.local' },
@@ -101,6 +103,8 @@ export default manejar(async (req, res) => {
     sha: resultado.sha,
     local: Boolean(resultado.local),
     actualizado: site.actualizado,
+    // El panel la compara con /version.json para saber cuándo ya se ve en el sitio
+    contenido: huellaContenido(textos),
   })
 })
 

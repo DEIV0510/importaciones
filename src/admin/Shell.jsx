@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-  AlertCircle, Eye, HelpCircle, History, Image, LayoutGrid, LogOut, Menu,
+  AlertCircle, CircleCheck, ExternalLink, Eye, HelpCircle, History, Image, LayoutGrid, LogOut, Menu,
   Palette, Rocket, Settings, Share2, Sparkles, X,
 } from 'lucide-react'
 import { api } from './api'
@@ -36,8 +36,36 @@ const APARTADOS = [
     nota: 'Publicaciones anteriores y restauración.' },
 ]
 
+/**
+ * Dónde abre la previsualización según lo que se está editando. Abría siempre
+ * arriba, en la portada: quien acababa de añadir productos no los veía (estaban
+ * cuatro pantallas más abajo) y creía que no se habían guardado.
+ */
+const SECCION_PREVIA = { catalogo: 'catalogo', portada: 'inicio', contacto: 'contacto' }
+
+const NOMBRE_POR_DEFECTO = 'Nuevo producto'
+
+/** Productos visibles que se publicarían sin terminar. */
+function productosSinTerminar(productos, categorias) {
+  const lineas = new Set((categorias ?? []).map((c) => c.id))
+  return (productos ?? [])
+    .filter((p) => p.visible !== false)
+    .filter((p) => !p.nombre?.trim() || p.nombre.trim() === NOMBRE_POR_DEFECTO)
+    .map((p) => ({
+      nombre: p.nombre?.trim() || '(sin nombre)',
+      faltas: [
+        'sin nombre propio',
+        !p.imagen && 'sin foto',
+        !(p.categorias ?? []).some((id) => lineas.has(id)) && 'sin línea',
+      ].filter(Boolean),
+    }))
+}
+
 export default function Shell({ usuario, onSalir }) {
-  const { sucio, guardando, publicar, descartar, modo, cargando, error, recargar } = useEditor()
+  const {
+    sucio, guardando, publicar, descartar, modo, cargando, error, recargar,
+    despliegue, cerrarDespliegue, productos, categorias,
+  } = useEditor()
 
   const [apartado, setApartado] = useState('catalogo')
   const [menuAbierto, setMenuAbierto] = useState(false)
@@ -50,6 +78,7 @@ export default function Shell({ usuario, onSalir }) {
   const [guiaAbierta, setGuiaAbierta] = useState(() => !guiaYaVista())
 
   const actual = APARTADOS.find((a) => a.id === apartado)
+  const sinTerminar = publicando ? productosSinTerminar(productos, categorias) : []
 
   async function salir() {
     if (sucio && !window.confirm('Tienes cambios sin publicar. ¿Seguro que quieres salir?')) return
@@ -162,6 +191,59 @@ export default function Shell({ usuario, onSalir }) {
             </button>
           </div>
         )}
+
+        {/* Estado de la última publicación en el sitio en vivo */}
+        {despliegue && (
+          <div
+            role="status"
+            data-despliegue={despliegue.estado}
+            className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t px-4 py-2.5 text-sm ${
+              despliegue.estado === 'listo'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                : despliegue.estado === 'lento'
+                  ? 'border-amber-200 bg-amber-50 text-amber-900'
+                  : 'border-sky-200 bg-sky-50 text-sky-900'
+            }`}
+          >
+            {despliegue.estado === 'publicando' && (
+              <>
+                <span className="flex items-center gap-2 font-semibold">
+                  <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
+                  Publicando en el sitio…
+                </span>
+                <span className="text-sky-800">Suele tardar cerca de un minuto. Puedes seguir trabajando.</span>
+              </>
+            )}
+            {despliegue.estado === 'listo' && (
+              <>
+                <span className="flex items-center gap-2 font-semibold">
+                  <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+                  Listo: tus cambios ya se ven en el sitio.
+                </span>
+                <a href="/" target="_blank" rel="noopener"
+                  className="inline-flex items-center gap-1 font-semibold underline underline-offset-2">
+                  Ver el sitio
+                  <ExternalLink className="size-3.5" aria-hidden="true" />
+                </a>
+              </>
+            )}
+            {despliegue.estado === 'lento' && (
+              <>
+                <span className="flex items-center gap-2 font-semibold">
+                  <AlertCircle className="size-4 shrink-0" aria-hidden="true" />
+                  Está tardando más de lo normal.
+                </span>
+                <span>Lo publicado está guardado; vuelve a mirar el sitio en unos minutos.</span>
+              </>
+            )}
+            {despliegue.estado !== 'publicando' && (
+              <button type="button" onClick={cerrarDespliegue} aria-label="Cerrar este aviso"
+                className="ml-auto rounded-lg p-1 hover:bg-black/5">
+                <X className="size-4" aria-hidden="true" />
+              </button>
+            )}
+          </div>
+        )}
       </header>
 
       <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6">
@@ -229,7 +311,9 @@ export default function Shell({ usuario, onSalir }) {
 
       {guiaAbierta && <Guia onCerrar={() => setGuiaAbierta(false)} />}
 
-      {previsualizando && <Previsualizacion onCerrar={() => setPrevisualizando(false)} />}
+      {previsualizando && (
+        <Previsualizacion seccionInicial={SECCION_PREVIA[apartado]} onCerrar={() => setPrevisualizando(false)} />
+      )}
 
       {/* ------------------------------------------------ publicar */}
       {publicando && (
@@ -241,8 +325,23 @@ export default function Shell({ usuario, onSalir }) {
             <p className="mt-2 text-sm text-slate-600">
               {modo === 'local'
                 ? 'Estás en modo local: se escribirá en tu copia del proyecto, no en el sitio publicado.'
-                : 'Se guardarán en el repositorio y el sitio se reconstruirá solo. Tarda alrededor de un minuto en verse.'}
+                : 'Se guardarán en el repositorio y el sitio se reconstruirá solo. Tarda alrededor de un minuto en verse; el panel te avisa cuando ya esté.'}
             </p>
+
+            {/* Un «Nuevo producto» sin nombre ni foto llegó a publicarse así */}
+            {sinTerminar.length > 0 && (
+              <div data-sin-terminar className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                <p className="font-semibold">Antes de publicar, revisa:</p>
+                <ul className="mt-1 list-disc pl-5">
+                  {sinTerminar.slice(0, 5).map((p, i) => (
+                    <li key={i}>«{p.nombre}»: {p.faltas.join(', ')}.</li>
+                  ))}
+                </ul>
+                <p className="mt-1 text-amber-800">
+                  Si publicas ahora, {sinTerminar.length === 1 ? 'saldrá' : 'saldrán'} así en el sitio.
+                </p>
+              </div>
+            )}
 
             <label htmlFor="nota" className="mt-4 block text-sm font-medium text-slate-700">
               ¿Qué cambiaste? <span className="font-normal text-slate-400">(opcional)</span>

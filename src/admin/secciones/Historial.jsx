@@ -12,7 +12,7 @@ import { Boton, Confirmar, Panel, Vacio } from '../ui'
  * recoge siempre quién publicó y cuándo.
  */
 export default function Historial() {
-  const { avisar, recargar, modo } = useEditor()
+  const { avisar, recargar, modo, seguirDespliegue } = useEditor()
   const [versiones, setVersiones] = useState(null)
   const [error, setError] = useState(null)
   const [restaurando, setRestaurando] = useState(null)
@@ -28,9 +28,10 @@ export default function Historial() {
     setConfirmando(null)
     setRestaurando(sha)
     try {
-      await api.restaurar(sha)
+      const res = await api.restaurar(sha)
       avisar('Versión restaurada. Se publicó como un cambio nuevo.')
       await recargar()
+      if (!res.local) seguirDespliegue(res.contenido)
       const r = await api.historial()
       setVersiones(r.versiones)
     } catch (err) {

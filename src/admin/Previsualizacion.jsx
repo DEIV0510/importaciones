@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Monitor, Smartphone, X } from 'lucide-react'
 import App from '../App'
 import { ContentProvider } from '../content/ContentContext'
@@ -12,11 +12,45 @@ import { useEditor } from './estado'
  * se ve bien aquí, se verá igual al publicar. El contenido llega por el
  * contexto y el tema se aplica solo a este contenedor, para que los colores
  * que estás probando no repinten el panel.
+ *
+ * @param {string} [seccionInicial]  Id de la sección donde abrir ('catalogo'…).
  */
-export default function Previsualizacion({ onCerrar }) {
+const SALTOS = [
+  { id: 'inicio', texto: 'Inicio' },
+  { id: 'catalogo', texto: 'Productos' },
+  { id: 'contacto', texto: 'Contacto' },
+]
+// La barra del sitio es fija y tapa lo de arriba: se deja ese margen
+const MARGEN_BARRA = 96
+
+export default function Previsualizacion({ onCerrar, seccionInicial }) {
   const { borrador, urlPanel } = useEditor()
   const [ancho, setAncho] = useState('escritorio')
   const contenedor = useRef(null)
+  const desplazable = useRef(null)
+
+  const irA = useCallback((id) => {
+    const caja = desplazable.current
+    if (!caja) return null
+    const destino = id && id !== 'inicio' ? contenedor.current?.querySelector(`#${id}`) : null
+    const top = destino
+      ? destino.getBoundingClientRect().top - caja.getBoundingClientRect().top + caja.scrollTop - MARGEN_BARRA
+      : 0
+    caja.scrollTo({ top: Math.max(0, top) })
+    return caja.scrollTop
+  }, [])
+
+  // Se mide dos veces: las fotos de arriba pueden cambiar la altura al cargar.
+  // La segunda solo corrige si la persona no se ha movido entretanto.
+  useEffect(() => {
+    if (!seccionInicial) return
+    let puesto = null
+    const t1 = setTimeout(() => { puesto = irA(seccionInicial) }, 120)
+    const t2 = setTimeout(() => {
+      if (puesto !== null && desplazable.current?.scrollTop === puesto) irA(seccionInicial)
+    }, 700)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [seccionInicial, irA, ancho])
 
   useEffect(() => {
     if (contenedor.current) aplicarTema(borrador?.site?.tema, contenedor.current)
@@ -39,11 +73,21 @@ export default function Previsualizacion({ onCerrar }) {
           (z-50) y su ventana de producto (z-[70]) en este mismo contexto. Sin
           esto la barra del sitio tapaba el botón «Cerrar» y solo quedaba
           Escape para salir. */}
-      <header className="relative z-[100] flex shrink-0 items-center justify-between gap-3 border-b border-slate-700 bg-slate-900 px-4 py-2.5">
-        <p className="text-sm font-semibold text-white">
-          Previsualización
-          <span className="ml-2 font-normal text-slate-400">así quedará al publicar</span>
-        </p>
+      <header className="relative z-[100] flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-slate-700 bg-slate-900 px-4 py-2.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+          <p className="text-sm font-semibold text-white max-sm:hidden">
+            Previsualización
+            <span className="ml-2 font-normal text-slate-400 max-lg:hidden">así quedará al publicar</span>
+          </p>
+          <nav aria-label="Ir a una sección" className="flex rounded-lg bg-slate-800 p-0.5">
+            {SALTOS.map((s) => (
+              <button key={s.id} type="button" onClick={() => irA(s.id)}
+                className="rounded-md px-2.5 py-1 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white">
+                {s.texto}
+              </button>
+            ))}
+          </nav>
+        </div>
 
         <div className="flex items-center gap-2">
           <div className="flex rounded-lg bg-slate-800 p-0.5">
@@ -67,7 +111,7 @@ export default function Previsualizacion({ onCerrar }) {
         </div>
       </header>
 
-      <div className="flex-1 overflow-auto bg-slate-800 p-0 sm:p-4">
+      <div ref={desplazable} className="flex-1 overflow-auto bg-slate-800 p-0 sm:p-4">
         <div
           ref={contenedor}
           className={`mx-auto min-h-full overflow-hidden bg-white ${
