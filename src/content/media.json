@@ -176,6 +176,19 @@
     "version": "b5260dda95"
   },
   {
+    "id": "cyc007",
+    "alt": "MILLARE CYC-007 x 18 METROS",
+    "variantes": [
+      "sm",
+      "lg",
+      "fallback",
+      "hero"
+    ],
+    "bytes": 916701,
+    "origen": "panel",
+    "version": "a375107f4d"
+  },
+  {
     "id": "cyc012-2",
     "alt": "MILLARE CYC-002 CM X 18 METROS",
     "variantes": [
