@@ -49,14 +49,14 @@
   },
   {
     "id": "producto-1794495285221",
-    "nombre": "Nuevo producto",
+    "nombre": "MILLARE CYC-007 x 18 METROS",
     "categorias": [
       "confeccion"
     ],
-    "imagen": null,
+    "imagen": "cyc007",
     "galeria": null,
     "descripcion": null,
-    "precio": null,
+    "precio": 13700,
     "precioUnidad": null,
     "destacado": false,
     "visible": true,
@@ -64,15 +64,15 @@
   },
   {
     "id": "producto-1794495303131",
-    "nombre": "Nuevo producto",
+    "nombre": "MILLARE CYC-009  1.5CMx 18 METROS",
     "categorias": [
       "confeccion"
     ],
-    "imagen": null,
+    "imagen": "cyc009",
     "galeria": null,
     "descripcion": null,
-    "precio": null,
-    "precioUnidad": null,
+    "precio": 11500,
+    "precioUnidad": "PAQUETE",
     "destacado": false,
     "visible": true,
     "orden": 4
